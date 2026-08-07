@@ -1,0 +1,56 @@
+---
+title: Integrate with Claude Code
+description: Wire Graft into Claude Code for automatic context injection and background graph sync.
+sidebar:
+  order: 1
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Graft's deepest integration is with Claude Code. Once wired in, Graft rides along in every session: pulling relevant nodes into prompts and rebuilding the graph in the background.
+
+## Wire up Claude Code
+
+<Steps>
+
+1. **Run init targeting Claude Code**
+
+   ```bash
+   graft init --agents claude
+   ```
+
+   This drops a statusline and hooks into `.claude/`, skipping the agent selection prompt.
+
+2. **Commit the wiring**
+
+   ```bash
+   git add .claude && git commit -m "wire in graft"
+   ```
+
+   Your teammates get the wiring when they pull. They run `graft build` once to generate their local graph.
+
+3. **Start a Claude Code session**
+
+   From the next session on, Graft automatically:
+   - Loads matching context nodes into each prompt
+   - Syncs the graph in the background after every agent turn
+   - Tracks uncommitted, unstaged, and staged changes
+
+</Steps>
+
+<Aside type="tip">
+Run `graft init --dry-run` first to preview every file that would be created or modified.
+</Aside>
+
+## How it works under the hood
+
+The hooks in `.claude/` tell Claude Code to:
+
+1. Inject the relevant `graft/` nodes as context before each prompt
+2. Run a lightweight structural refresh (~3ms) after each turn to detect file changes
+3. Rebuild only the changed nodes (the LLM is never called during refresh — it's pure tree-sitter)
+
+## See also
+
+- [Set Up MCP Server](/how-to/set-up-mcp-server/) — Alternative integration via the Model Context Protocol.
+- [Architecture Decisions](/explanation/architecture-decisions/) — Why Graft is local-first with no daemon.

@@ -1,0 +1,43 @@
+---
+title: Graft Docs
+description: Documentation for Graft — the open-source context layer for AI coding agents.
+template: splash
+hero:
+  title: Graft
+  tagline: Persistent context for AI coding agents. 4× cheaper. 3× faster. Zero infrastructure.
+  actions:
+    - text: Get Started
+      link: /tutorials/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/NanoNets/Graft
+      icon: external
+      variant: secondary
+      attrs:
+        target: _blank
+        rel: noopener noreferrer
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Explore the Docs
+
+<CardGrid>
+  <Card title="Tutorials" icon="open-book">
+    New to Graft? Follow step-by-step guides to get up and running in minutes.
+    [Get started →](/tutorials/getting-started/)
+  </Card>
+  <Card title="How-To Guides" icon="setting">
+    Solve specific problems: configure providers, integrate with Claude Code, enable deep mode, and more.
+    [Browse guides →](/how-to/configure-providers/)
+  </Card>
+  <Card title="Reference" icon="information">
+    Complete CLI commands, environment variables, graph structure, and node format specifications.
+    [View reference →](/reference/cli/)
+  </Card>
+  <Card title="Explanation" icon="puzzle">
+    Understand how Graft works, why it exists, and the design decisions behind it.
+    [Learn more →](/explanation/why-graft-exists/)
+  </Card>
+</CardGrid>

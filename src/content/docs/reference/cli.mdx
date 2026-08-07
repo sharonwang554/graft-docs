@@ -1,0 +1,117 @@
+---
+title: CLI Commands
+description: Complete reference for all Graft CLI commands, flags, and options.
+sidebar:
+  order: 1
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## `graft init`
+
+Initialize Graft in a repository. Detects installed coding agents, builds the graph, and wires hooks.
+
+```bash
+graft init [options]
+```
+
+| Flag | Description |
+|---|---|
+| `--dry-run` | Preview every file that would be created or modified without writing anything. |
+| `--agents <name>` | Skip the agent selection prompt and wire a specific agent (e.g., `claude`). |
+
+---
+
+## `graft build`
+
+Build or rebuild the codebase graph.
+
+```bash
+graft build [dir] [options]
+```
+
+| Flag | Description |
+|---|---|
+| `--deep` | Enable LLM enrichment — adds per-symbol summaries, concept nodes, and crux insights. Requires provider credentials. |
+| `--extensions <ext...>` | Restrict build to specific file extensions (e.g., `.ts .py`). |
+| `--no-reuse` | Force a complete re-parse of all files, ignoring the content hash cache. |
+| `--provider <name>` | LLM provider for deep mode (`openai`, `anthropic`, `ollama`, `openrouter`, `google`). |
+| `--model <name>` | Model to use for deep mode. |
+
+<Aside>
+Without `--deep`, the build is deterministic tree-sitter parsing only. No API key or network access required.
+</Aside>
+
+---
+
+## `graft map`
+
+Display a structural map of the repository — files, symbols, and edges.
+
+```bash
+graft map
+```
+
+---
+
+## `graft grep`
+
+Search within the generated context graph.
+
+```bash
+graft grep <query>
+```
+
+Searches node descriptions and content, not just filenames.
+
+---
+
+## `graft callers`
+
+Analyze call sites and callers for a specific symbol.
+
+```bash
+graft callers <symbol>
+```
+
+---
+
+## `graft check`
+
+Verify graph health and check content hash validity.
+
+```bash
+graft check
+```
+
+Identifies stale nodes where source files have changed since the last build.
+
+---
+
+## `graft mcp`
+
+Start the Graft Model Context Protocol (MCP) server.
+
+```bash
+graft mcp [dir]
+```
+
+Exposes the graph to any MCP-compatible agent.
+
+---
+
+## `graft viz`
+
+Generate visual representations of the codebase graph.
+
+```bash
+graft viz
+```
+
+---
+
+## Global options
+
+| Flag | Description |
+|---|---|
+| `--no-refresh` | Skip the automatic structural refresh before a query command. Also available as `GRAFT_NO_REFRESH=1`. |

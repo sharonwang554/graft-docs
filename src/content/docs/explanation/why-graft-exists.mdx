@@ -1,0 +1,43 @@
+---
+title: Why Graft Exists
+description: The agent re-exploration problem — why coding agents waste time rediscovering your codebase every session.
+sidebar:
+  order: 1
+---
+
+## The problem
+
+Every task, your coding agent starts blind. Before it can change anything, it re-explores the repo: grep a term, open a file, follow an import, back out, try again. It is rebuilding a picture of a codebase it mapped an hour ago and threw away.
+
+That rediscovery burns most of a run's tool calls, tokens, and latency — and it is pure overhead:
+
+- **Repeated.** Every task pays the exploration cost again, from zero.
+- **Discarded.** Whatever the agent figured out dies with the session.
+- **Unshared.** The next teammate, and their agent, start from scratch too.
+
+**Humans onboard to a codebase once. Agents onboard every single time.**
+
+## What Graft does differently
+
+Graft builds that understanding **once** and writes it into your repo as a folder of linked Markdown files. Each node describes, in plain English, what a part of the system does and how it connects to the rest — the way a senior engineer would explain it.
+
+Key design principles:
+
+- **Real explanations, not a list of symbols.** The agent needs to understand the system, not just have a function index.
+- **A real graph you can read.** No embeddings, no similarity search, no index to keep warm. The graph is files your agent opens, greps, and follows like any other file.
+- **Grafted into git.** The graph is just files. Commit it and anyone who clones the repo has it. No database, no server, no setup.
+- **Your provider, your key, your model.** Summaries are written by whatever LLM you choose, under your own key. The structural graph is deterministic tree-sitter and never calls a model.
+
+## The result
+
+| Metric | Without Graft | With Graft |
+|---|---|---|
+| Tool calls | Baseline | **46% fewer** |
+| Tokens | Baseline | **42% fewer** |
+| Latency | Baseline | **60% less** |
+| Correctness (SWE-bench) | 6/9 | **8/9** |
+
+## See also
+
+- [Benchmarks](/explanation/benchmarks/) — Full benchmark methodology and results.
+- [Getting Started](/tutorials/getting-started/) — Try Graft in 2 minutes.

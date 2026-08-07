@@ -1,0 +1,51 @@
+---
+title: Architecture Decisions
+description: Why Graft is local-first, uses no vector database, requires no daemon, and stores its graph as plain files.
+sidebar:
+  order: 3
+---
+
+## Local-first, zero infrastructure
+
+Graft makes deliberate architectural choices that distinguish it from other code intelligence tools:
+
+### No vector database
+
+Many context tools embed code into vectors and run similarity search. Graft uses linked Markdown files instead:
+
+- **No index to keep warm.** The graph is files, not a running process.
+- **No similarity search.** Agents grep and follow links — the same tools they use for any file.
+- **No drift.** A stale graph shows up as a diff in review, not as silently wrong search results.
+
+### No daemon
+
+Graft has no background process. The graph is rebuilt on demand:
+
+- `graft build` rebuilds explicitly
+- Query commands auto-refresh in ~3ms before answering
+- Claude Code hooks trigger rebuilds after each agent turn
+
+### Git-native
+
+The graph is just files in `graft/`:
+
+- **Portable** — Anyone who clones the repo has the graph (if committed) or regenerates it with `graft build`.
+- **Diffable** — When code changes move things around, the graph diff appears in the same PR.
+- **No setup** — No database, no server, no configuration beyond `graft init`.
+
+### Your provider, your key
+
+Summaries are written by any provider you choose:
+
+- OpenAI, Anthropic, Google, Ollama, OpenRouter, LiteLLM proxy
+- Under your own API key
+- The structural graph (tree-sitter) never calls a model
+
+### No telemetry
+
+Graft collects no usage data, sends no analytics, and phones home to nothing.
+
+## See also
+
+- [Why Graft Exists](/explanation/why-graft-exists/) — The problem that motivated these decisions.
+- [How the Graph Works](/explanation/how-the-graph-works/) — The technical implementation.

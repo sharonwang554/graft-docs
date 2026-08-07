@@ -1,0 +1,48 @@
+---
+title: Graph Structure
+description: Technical reference for the graft/ directory layout, wiring.json, and file organization.
+sidebar:
+  order: 3
+---
+
+The `graft/` directory contains the complete knowledge graph of your codebase. It is a local, regenerable cache — like `node_modules` — and is excluded from git by default.
+
+## Directory layout
+
+```
+graft/
+├── *.md                    # Markdown node files (one per subsystem/concept)
+└── .graph/
+    └── wiring.json         # Per-symbol code graph (tree-sitter output)
+```
+
+## Markdown node files
+
+Each `.md` file in `graft/` represents a subsystem, API, or concept in your codebase. Graft groups files into a curated set of nodes rather than one-per-file, so a large repo becomes a few dozen readable nodes.
+
+Nodes contain:
+- Plain-English descriptions of what the subsystem does
+- Typed wikilinks to other nodes (e.g., `depends_on`, `implements`, `produces`)
+- Content hash for stale detection
+
+## Wiring graph (`wiring.json`)
+
+The `graft/.graph/wiring.json` file is a per-symbol code graph built by tree-sitter:
+- Every function, class, and call edge
+- Deterministic — no model, no network
+- Used for `graft callers`, `graft grep`, and structural queries
+
+## Content hashing
+
+Every file is tracked by SHA content hash. When you run `graft build`, only changed files are re-processed. The structural refresh (~3ms) that runs before query commands uses these hashes to detect staleness.
+
+## Cache behavior
+
+- `graft build` — Incremental by default. Only re-parses changed files.
+- `graft build --no-reuse` — Forces a complete cold re-parse.
+- The `graft/` directory is added to `.gitignore` automatically by `graft init`.
+
+## See also
+
+- [Node Format](/reference/node-format/) — Structure of individual Markdown nodes.
+- [How the Graph Works](/explanation/how-the-graph-works/) — The two-pass build architecture.

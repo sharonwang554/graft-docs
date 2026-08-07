@@ -1,0 +1,61 @@
+---
+title: How the Graph Works
+description: Architecture of Graft's two-pass build — tree-sitter structural parsing and optional LLM enrichment.
+sidebar:
+  order: 2
+---
+
+## Two-pass architecture
+
+Graft builds the graph in two passes:
+
+### Tier 1: Tree-sitter (structural, deterministic)
+
+Every source file is parsed with [tree-sitter](https://tree-sitter.github.io/) to extract:
+
+- Functions, classes, and interfaces
+- Call edges and dependency relationships
+- Import/export structure
+
+This produces `graft/.graph/wiring.json` — the per-symbol code graph. It is:
+
+- **Deterministic** — same input always produces the same output
+- **Free** — no API key, no network, no cost
+- **Fast** — pure parsing, runs in milliseconds
+
+This is what `graft build` (without `--deep`) produces.
+
+### Tier 2: LLM enrichment (optional, `--deep`)
+
+The `--deep` flag adds two LLM passes:
+
+1. **Pass 1** — Each source file is summarized into a short description
+2. **Pass 2** — Summaries are grouped into curated nodes with typed links
+
+Graft chooses the right level of detail — a big repo becomes a few dozen readable nodes, not one per file.
+
+## Content hashing and incremental builds
+
+Every pass is cached by content hash — both the LLM summaries and the tree-sitter parse. Re-running only touches the files that changed:
+
+| Scenario | Time (124-file repo) |
+|---|---|
+| Cold build | 0.74s |
+| One file changed | 0.18s |
+| Nothing changed | 0.18s |
+
+## Automatic refresh before queries
+
+Every query command (`graft grep`, `graft callers`, `graft map`, etc.) runs a structural refresh before answering:
+
+1. Stats the tree against the last build's fingerprint (~3ms)
+2. Rebuilds only if something moved
+3. Catches uncommitted, unstaged, and staged changes (Graft never reads git)
+
+The refresh is structural and costs $0 — it never calls the LLM. Disable with `--no-refresh` or `GRAFT_NO_REFRESH=1`.
+
+## See also
+
+- [Enable Deep Mode](/how-to/enable-deep-mode/) — How to run the LLM-enriched build.
+- [Graph Structure](/reference/graph-structure/) — Technical details of `graft/` directory.
+- [Architecture Decisions](/explanation/architecture-decisions/) — Why this design.

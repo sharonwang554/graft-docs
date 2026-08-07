@@ -1,0 +1,52 @@
+---
+title: Set Up MCP Server
+description: Start Graft's Model Context Protocol server for agent integration.
+sidebar:
+  order: 2
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Graft can expose its graph via the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/), allowing any MCP-compatible agent to query codebase context.
+
+## Start the MCP server
+
+<Steps>
+
+1. **Build the graph first** (if you haven't already)
+
+   ```bash
+   graft build
+   ```
+
+2. **Start the server**
+
+   ```bash
+   graft mcp
+   ```
+
+   Or specify a directory:
+
+   ```bash
+   graft mcp ./my-project
+   ```
+
+3. **Connect your agent**
+
+   Point your MCP-compatible agent at the server. The agent can then query the graph using Graft's retrieval tools (`graft_find_code`, `graft_file_api`, etc.).
+
+</Steps>
+
+## Push vs. Pull
+
+Graft supports two modes of agent integration:
+
+| Mode | How it works | Best for |
+|---|---|---|
+| **Push** (Claude Code hooks) | Injects context into every prompt automatically | Speed — 60% less time, 46% fewer tool calls |
+| **Pull** (MCP server) | Agent requests context only when needed | Correctness — 98% accuracy (+5 points over cold) |
+
+## See also
+
+- [Integrate with Claude Code](/how-to/integrate-claude-code/) — The push-mode deep integration.
+- [CLI Reference](/reference/cli/) — Full `graft mcp` command options.

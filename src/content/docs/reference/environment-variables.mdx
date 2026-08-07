@@ -1,0 +1,28 @@
+---
+title: Environment Variables
+description: Complete reference for all Graft environment variables.
+sidebar:
+  order: 2
+---
+
+All Graft environment variables are prefixed with `GRAFT_`. They configure LLM providers for deep mode and control runtime behavior.
+
+## LLM Provider Configuration
+
+| Variable | Description | Example |
+|---|---|---|
+| `GRAFT_PROVIDER` | LLM provider name | `openai`, `anthropic`, `ollama`, `openrouter`, `google` |
+| `GRAFT_API_KEY` | API key for the chosen provider | `sk-...` |
+| `GRAFT_MODEL` | Model name to use | `gpt-4o-mini`, `claude-sonnet` |
+| `GRAFT_BASE_URL` | Custom base URL (for Ollama, LiteLLM proxy, or self-hosted) | `http://localhost:11434` |
+
+## Runtime Configuration
+
+| Variable | Description | Default |
+|---|---|---|
+| `GRAFT_NO_REFRESH` | Set to `1` to skip the automatic structural refresh before query commands | `0` (refresh enabled) |
+
+## See also
+
+- [Configure Providers](/how-to/configure-providers/) — Step-by-step provider setup.
+- [Enable Deep Mode](/how-to/enable-deep-mode/) — Using these variables for the deep build.

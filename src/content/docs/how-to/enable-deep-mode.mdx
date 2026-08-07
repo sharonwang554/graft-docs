@@ -1,0 +1,53 @@
+---
+title: Enable Deep Mode
+description: Add LLM-powered summaries and concept nodes to your codebase graph.
+sidebar:
+  order: 3
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+By default, `graft build` uses tree-sitter for deterministic, model-free structural parsing. The `--deep` flag adds a second pass that uses an LLM to generate richer summaries.
+
+## What deep mode adds
+
+| Feature | Standard build | Deep build |
+|---|---|---|
+| File structure & symbols | ✅ | ✅ |
+| Call graph & dependencies | ✅ | ✅ |
+| Per-symbol one-line summaries | ❌ | ✅ |
+| Concept nodes | ❌ | ✅ |
+| "Crux" architectural insights | ❌ | ✅ |
+
+## Enable deep mode
+
+<Steps>
+
+1. **Set your LLM provider credentials**
+
+   ```bash
+   export GRAFT_PROVIDER=openai      # or anthropic, ollama, openrouter, google
+   export GRAFT_API_KEY=your-key
+   ```
+
+   See [Configure Providers](/how-to/configure-providers/) for all supported providers.
+
+2. **Run the deep build**
+
+   ```bash
+   graft build --deep
+   ```
+
+   The first deep build summarizes every source file, then groups summaries into curated nodes. Results are cached by content hash — subsequent builds only re-process changed files.
+
+</Steps>
+
+<Aside type="caution">
+Deep mode calls your LLM provider and incurs API costs. The standard `graft build` (without `--deep`) is free, deterministic, and needs no API key.
+</Aside>
+
+## See also
+
+- [Configure Providers](/how-to/configure-providers/) — Set up OpenAI, Anthropic, Ollama, and more.
+- [Environment Variables Reference](/reference/environment-variables/) — All `GRAFT_*` environment variables.
+- [How the Graph Works](/explanation/how-the-graph-works/) — Architecture of the two-pass build.

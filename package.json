@@ -1,0 +1,25 @@
+{
+  "name": "graft-docs",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.41.7",
+    "@astrojs/vercel": "^11.0.5",
+    "astro": "^7.1.6",
+    "sharp": "^0.35.3",
+    "vercel": "^58.7.1"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.3"
+  }
+}

@@ -1,0 +1,39 @@
+---
+title: Work with Monorepos
+description: Use Graft with monorepos and multi-repo folder structures.
+sidebar:
+  order: 5
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Graft handles monorepos and multi-repo folders. You can scope builds to specific directories or file types.
+
+## Build a specific directory
+
+```bash
+graft build ./packages/core
+```
+
+This builds the graph for only the specified subdirectory.
+
+## Filter by file extension
+
+```bash
+graft build --extensions .ts .py
+```
+
+Restrict the build to specific file types. Useful in polyglot repos where you only want to index certain languages.
+
+## Multiple repos in one folder
+
+If your workspace contains multiple repositories, run `graft init` in each one independently. Each repo gets its own `graft/` directory and its own graph.
+
+<Aside type="tip">
+Combine directory scoping with extension filtering for precise control: `graft build ./packages/api --extensions .ts`
+</Aside>
+
+## See also
+
+- [CLI Reference](/reference/cli/) — Full `graft build` options.
+- [Supported Languages](/reference/supported-languages/) — All 20+ languages Graft can parse.

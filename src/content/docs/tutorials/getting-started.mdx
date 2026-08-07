@@ -1,0 +1,73 @@
+---
+title: Getting Started
+description: Install Graft and build your first codebase graph in under 2 minutes.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Graft gives your AI coding agent persistent context about your codebase. This tutorial walks you through installation and your first graph build.
+
+## Prerequisites
+
+- **Node.js** 18 or later
+- A codebase (any language — Graft supports 20+ via tree-sitter)
+
+## Install and Initialize
+
+<Steps>
+
+1. **Install Graft globally**
+
+   ```bash
+   npm install -g @nanonets/graft
+   ```
+
+   Or use it directly without installing:
+
+   ```bash
+   npx @nanonets/graft init
+   ```
+
+2. **Initialize in your project**
+
+   Navigate to your project directory and run:
+
+   ```bash
+   graft init
+   ```
+
+   `graft init` will:
+   - Ask which coding agents to wire up (Claude Code, Cursor, etc.)
+   - Build the `graft/` graph from your source code
+   - Drop hooks into your agent's config (e.g., `.claude/`)
+   - Add `graft/` to your `.gitignore`
+
+   <Aside>
+   Run `graft init --dry-run` to preview every file it would touch before committing to anything.
+   </Aside>
+
+3. **Verify the graph**
+
+   ```bash
+   graft map
+   ```
+
+   You should see a structural overview of your codebase — the nodes, systems, and links that Graft built.
+
+4. **Share with your team**
+
+   The wiring config (e.g., `.claude/`) is what you commit. The graph itself is a local regenerable cache:
+
+   ```bash
+   git add .claude && git commit -m "wire in graft"
+   ```
+
+   Each teammate runs `graft build` to generate their own local graph.
+
+</Steps>
+
+## What's next?
+
+- [Your First Graph](/tutorials/your-first-graph/) — Explore the generated graph with `graft grep`, `graft callers`, and more.
+- [CLI Reference](/reference/cli/) — Full list of all Graft commands.
+- [Why Graft Exists](/explanation/why-graft-exists/) — Understand the problem Graft solves.

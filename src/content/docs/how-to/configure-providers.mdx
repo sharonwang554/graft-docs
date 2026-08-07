@@ -1,0 +1,71 @@
+---
+title: Configure LLM Providers
+description: Set up OpenAI, Anthropic, Ollama, OpenRouter, Google, and other LLM providers for Graft's deep mode.
+sidebar:
+  order: 4
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+Graft's `--deep` mode uses an LLM to generate summaries. You can use any supported provider — your key, your model, your choice.
+
+## Supported providers
+
+| Provider | `GRAFT_PROVIDER` value | Example models |
+|---|---|---|
+| OpenAI | `openai` | gpt-4o, gpt-4o-mini |
+| Anthropic | `anthropic` | Claude Sonnet, Claude Haiku |
+| Google | `google` | Gemini 1.5 Pro, Gemini Flash |
+| Ollama (local) | `ollama` | LLaMA, Mistral, etc. |
+| OpenRouter | `openrouter` | Any model via OpenRouter |
+| LiteLLM proxy | Set `GRAFT_BASE_URL` | Any model behind the proxy |
+
+## Configuration
+
+<Tabs>
+  <TabItem label="OpenAI">
+    ```bash
+    export GRAFT_PROVIDER=openai
+    export GRAFT_API_KEY=sk-...
+    export GRAFT_MODEL=gpt-4o-mini   # optional, has a default
+    ```
+  </TabItem>
+  <TabItem label="Anthropic">
+    ```bash
+    export GRAFT_PROVIDER=anthropic
+    export GRAFT_API_KEY=sk-ant-...
+    export GRAFT_MODEL=claude-sonnet  # optional
+    ```
+  </TabItem>
+  <TabItem label="Google">
+    ```bash
+    export GRAFT_PROVIDER=google
+    export GRAFT_API_KEY=...
+    export GRAFT_MODEL=gemini-1.5-flash  # optional
+    ```
+  </TabItem>
+  <TabItem label="Ollama">
+    ```bash
+    export GRAFT_PROVIDER=ollama
+    export GRAFT_BASE_URL=http://localhost:11434
+    export GRAFT_MODEL=llama3
+    # No API key needed for local models
+    ```
+  </TabItem>
+  <TabItem label="OpenRouter">
+    ```bash
+    export GRAFT_PROVIDER=openrouter
+    export GRAFT_API_KEY=sk-or-...
+    export GRAFT_MODEL=anthropic/claude-sonnet
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+You can also set these via CLI flags: `graft build --deep --provider openai --model gpt-4o-mini`
+</Aside>
+
+## See also
+
+- [Environment Variables Reference](/reference/environment-variables/) — Complete list of `GRAFT_*` variables.
+- [Enable Deep Mode](/how-to/enable-deep-mode/) — How to run the deep build.

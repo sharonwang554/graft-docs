@@ -1,0 +1,66 @@
+---
+title: Benchmarks & Performance
+description: Controlled benchmark results and SWE-bench Verified scores showing Graft's impact on agent efficiency and correctness.
+sidebar:
+  order: 4
+---
+
+## Controlled benchmark
+
+A 162-run controlled benchmark compared three variants of the same Claude Sonnet 5 agent with the same file tools:
+
+- **Cold** — Explores the repo from zero each time
+- **Graft (push)** — Context bundle injected up front
+- **Graft (pull)** — Context available on demand via MCP tools
+
+An Opus 4.8 judge scored correctness with a required-keyword floor.
+
+### Results (mean per task)
+
+| Metric | Cold Claude Code | Claude Code + Graft |
+|---|---|---|
+| Cost | $0.0429 | **$0.0292 (−32%)** |
+| Tokens | 8,070 | **4,650 (−42%)** |
+| Tool calls | 4.2 | **2.3 (−46%)** |
+| Latency | 39.8s | **15.8s (−60%)** |
+| Correctness | 93% | **93% (equal)** |
+
+Graft never answered worse than cold on any corpus. The **pull** variant traded some speed for correctness: **98% accuracy**, +5 points over cold.
+
+## SWE-bench Verified
+
+The industry-standard benchmark — real GitHub issues from real repos, graded by the official `swebench` harness. Same model (Claude Sonnet 5), same Docker images, same turn limits.
+
+### Results
+
+| Metric | Cold Claude Code | Claude Code + Graft | Improvement |
+|---|---|---|---|
+| Correctness | 6 / 9 | **8 / 9** | **+33%** |
+| Tests passed | 1,260 | **1,280** | **+20** |
+| Tokens | 24.5M | **21.0M** | **−15%** |
+| Cost | $8.94 | **$7.82** | **−13%** |
+| Tool calls | 205 | **162** | **−21%** |
+| API requests | 370 | **304** | **−18%** |
+| Wall-clock time | 3,251s | **1,824s** | **−44%** |
+
+### Where Graft helped most
+
+| Instance | Cold | Graft | Token usage | Tool usage |
+|---|---|---|---:|---:|
+| `django-11133` | 65/65 ✅ | **65/65 ✅** | **78%** | **61%** |
+| `django-10554` | 25/25 ✅ | **25/25 ✅** | **66%** | **69%** |
+| `django-11276` | 574/574 ✅ | **574/574 ✅** | **61%** | **58%** |
+| `django-11400` | 62/64 ❌ | **64/64 ✅** | 347% | 308% |
+| `django-11532` | 131/149 ❌ | **149/149 ✅** | **63%** | **60%** |
+
+## Methodology notes
+
+- Efficiency benchmark: 162 runs, two repos (Graft itself + a Node/Express auth service), 3 trials each
+- SWE-bench: Official SWE-bench Verified images, official `swebench` 4.1.0 grader, native x86_64
+- Cost is cache-aware: reads ≈0.1×, writes 1.25×
+- Token/cost comparisons use only instances both arms resolved (like-for-like)
+
+## See also
+
+- [Why Graft Exists](/explanation/why-graft-exists/) — The problem these benchmarks measure.
+- [Getting Started](/tutorials/getting-started/) — Try Graft yourself.

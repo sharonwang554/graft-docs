@@ -1,0 +1,74 @@
+---
+title: Your First Graph
+description: Explore your codebase graph with graft map, grep, callers, and check.
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Once you've run `graft init`, you have a `graft/` directory full of linked Markdown nodes describing your codebase. This tutorial shows you how to explore and use it.
+
+## Explore the graph
+
+<Steps>
+
+1. **View the codebase map**
+
+   ```bash
+   graft map
+   ```
+
+   This displays a structural overview: files, symbols, and edges between them. Think of it as a table of contents for your entire codebase.
+
+2. **Search the graph**
+
+   ```bash
+   graft grep "authentication"
+   ```
+
+   `graft grep` searches within the generated context graph — not just filenames, but the semantic descriptions Graft built.
+
+3. **Trace call sites**
+
+   ```bash
+   graft callers MyFunction
+   ```
+
+   Find everywhere a specific symbol is called from, across the entire codebase.
+
+4. **Check graph health**
+
+   ```bash
+   graft check
+   ```
+
+   Verifies the graph is consistent and identifies stale nodes (files that have changed since the last build).
+
+</Steps>
+
+## Understand the `graft/` directory
+
+The generated graph lives in `graft/` and consists of:
+
+- **Markdown node files** (`graft/*.md`) — One per subsystem or concept, with typed wikilinks between them.
+- **Wiring graph** (`graft/.graph/wiring.json`) — Per-symbol code graph built by tree-sitter.
+- **Per-file wiring cards** — Mirror your source tree with structural information.
+
+<Aside type="tip">
+The `graft/` directory is a local, regenerable cache (like `node_modules`). Don't commit it — it's already in `.gitignore`.
+</Aside>
+
+## How agents use the graph
+
+When wired into Claude Code, Graft automatically:
+
+1. Pulls matching nodes into each prompt
+2. Rebuilds the graph in the background after every turn
+3. Keeps context fresh — including uncommitted and unstaged edits
+
+No daemon, no re-indexing, no manual steps.
+
+## What's next?
+
+- [Integrate with Claude Code](/how-to/integrate-claude-code/) — Set up the deep Claude Code integration.
+- [Enable Deep Mode](/how-to/enable-deep-mode/) — Add LLM-powered summaries to your graph.
+- [Graph Structure Reference](/reference/graph-structure/) — Technical details of the `graft/` directory.
