@@ -1,11 +1,11 @@
 ---
-title: Your First Graph
-description: Explore your codebase graph with graft map, grep, callers, and check.
+title: Search & orient
+description: How to explore your codebase graph with graft map, grep, callers, and check.
 ---
 
-import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
-Once you've run `graft init`, you have a `graft/` directory full of linked Markdown nodes describing your codebase. This tutorial shows you how to explore and use it.
+Once you've run `graft init`, you have a `graft/` directory full of linked Markdown nodes describing your codebase. This tutorial shows you how to explore and orient yourself.
 
 ## Explore the graph
 
@@ -17,7 +17,14 @@ Once you've run `graft init`, you have a `graft/` directory full of linked Markd
    graft map
    ```
 
-   This displays a structural overview: files, symbols, and edges between them. Think of it as a table of contents for your entire codebase.
+   `graft map` is a token-budgeted first look at a repo — directory clusters with file/symbol counts, each dir's local hubs, and the global hotspots — all ranked by in-degree, no LLM, no key:
+
+   ```text title="Terminal Output"
+   repo map — 113 files · 687 symbols · 2186 edges · typescript
+   
+   src/                63 files · 527 symbols   hubs: contextDirFor (node-file.ts, 21←), wiringPath (write.ts, 14←)
+   test/               43 files · 102 symbols   hubs: edge (graph-traverse.test.ts, 4←)
+   ```
 
 2. **Search the graph**
 
@@ -25,7 +32,14 @@ Once you've run `graft init`, you have a `graft/` directory full of linked Markd
    graft grep "authentication"
    ```
 
-   `graft grep` searches within the generated context graph — not just filenames, but the semantic descriptions Graft built.
+   `graft grep` is exhaustive over every indexed file and groups hits by enclosing symbol, ranked by the same in-edge coupling `graft map` uses:
+
+   ```text title="Terminal Output"
+   "NEEDLE" — 2 hits in 2 symbols across 1 files (searched 1 indexed files)
+   
+   heavilyCalled · function · src/a.ts:L1-L3 · 3 in-edges
+     L2: console.log("NEEDLE hit in heavilyCalled");
+   ```
 
 3. **Trace call sites**
 
@@ -33,7 +47,7 @@ Once you've run `graft init`, you have a `graft/` directory full of linked Markd
    graft callers MyFunction
    ```
 
-   Find everywhere a specific symbol is called from, across the entire codebase.
+   Find out who calls, references, imports, implements, or extends a symbol.
 
 4. **Check graph health**
 
@@ -41,7 +55,15 @@ Once you've run `graft init`, you have a `graft/` directory full of linked Markd
    graft check
    ```
 
-   Verifies the graph is consistent and identifies stale nodes (files that have changed since the last build).
+   Verifies if the `graft/` directory has drifted from the code (never auto-refreshes — it's the drift report).
+
+5. **Visualize the graph**
+
+   ```bash
+   graft viz
+   ```
+
+   Serves an interactive viewer on localhost so you can visually explore the nodes and dependencies.
 
 </Steps>
 
@@ -56,19 +78,3 @@ The generated graph lives in `graft/` and consists of:
 <Aside type="tip">
 The `graft/` directory is a local, regenerable cache (like `node_modules`). Don't commit it — it's already in `.gitignore`.
 </Aside>
-
-## How agents use the graph
-
-When wired into Claude Code, Graft automatically:
-
-1. Pulls matching nodes into each prompt
-2. Rebuilds the graph in the background after every turn
-3. Keeps context fresh — including uncommitted and unstaged edits
-
-No daemon, no re-indexing, no manual steps.
-
-## What's next?
-
-- [Integrate with Claude Code](/how-to/integrate-claude-code/) — Set up the deep Claude Code integration.
-- [Enable Deep Mode](/how-to/enable-deep-mode/) — Add LLM-powered summaries to your graph.
-- [Graph Structure Reference](/reference/graph-structure/) — Technical details of the `graft/` directory.

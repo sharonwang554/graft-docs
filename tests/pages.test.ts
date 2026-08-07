@@ -28,8 +28,6 @@ describe('Page existence', () => {
     const guides = [
       'integrate-claude-code',
       'set-up-mcp-server',
-      'enable-deep-mode',
-      'configure-providers',
       'work-with-monorepos',
       'visualize-codebase',
     ];
@@ -44,10 +42,7 @@ describe('Page existence', () => {
   describe('Reference', () => {
     const refs = [
       'cli',
-      'environment-variables',
       'graph-structure',
-      'node-format',
-      'supported-languages',
     ];
 
     for (const ref of refs) {
@@ -61,7 +56,6 @@ describe('Page existence', () => {
     const explanations = [
       'why-graft-exists',
       'how-the-graph-works',
-      'architecture-decisions',
       'benchmarks',
     ];
 

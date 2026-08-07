@@ -9,6 +9,8 @@ import { Steps, Aside } from '@astrojs/starlight/components';
 
 Graft's deepest integration is with Claude Code. Once wired in, Graft rides along in every session: pulling relevant nodes into prompts and rebuilding the graph in the background.
 
+![Graft terminal output showing init and claude code synced](/assets/graft-terminal.png)
+
 ## Wire up Claude Code
 
 <Steps>
@@ -50,7 +52,9 @@ The hooks in `.claude/` tell Claude Code to:
 2. Run a lightweight structural refresh (~3ms) after each turn to detect file changes
 3. Rebuild only the changed nodes (the LLM is never called during refresh — it's pure tree-sitter)
 
+![graft's post-edit hook](/assets/graft-hook-blast-radius-demo.gif)
+*Edit a file → blast radius appears inline → graph auto-resyncs → confirmed in `graft viz`*
+
 ## See also
 
 - [Set Up MCP Server](/how-to/set-up-mcp-server/) — Alternative integration via the Model Context Protocol.
-- [Architecture Decisions](/explanation/architecture-decisions/) — Why Graft is local-first with no daemon.

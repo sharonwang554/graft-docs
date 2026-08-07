@@ -1,0 +1,6 @@
+flowchart LR
+    S[Source files] --> T["Tier 1 — tree-sitter<br/>no model, no key"]
+    S --> P1["Pass 1 — LLM summarizes<br/>each file (--deep)"]
+    T --> W["graft/.graph/wiring.json<br/>per-symbol code graph"]
+    P1 --> P2["Pass 2 — group into nodes<br/>+ typed links"]
+    P2 --> N["graft/*.md<br/>markdown node graph"]

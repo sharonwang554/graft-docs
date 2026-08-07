@@ -1,16 +1,11 @@
 ---
-title: Getting Started
-description: Install Graft and build your first codebase graph in under 2 minutes.
+title: Quick start
+description: Install Graft and build your first codebase graph.
 ---
 
-import { Steps, Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
 Graft gives your AI coding agent persistent context about your codebase. This tutorial walks you through installation and your first graph build.
-
-## Prerequisites
-
-- **Node.js** 18 or later
-- A codebase (any language — Graft supports 20+ via tree-sitter)
 
 ## Install and Initialize
 
@@ -21,12 +16,7 @@ Graft gives your AI coding agent persistent context about your codebase. This tu
    ```bash
    npm install -g @nanonets/graft
    ```
-
-   Or use it directly without installing:
-
-   ```bash
-   npx @nanonets/graft init
-   ```
+   *Prefer not to install globally? `npx @nanonets/graft init` works the same way.*
 
 2. **Initialize in your project**
 
@@ -36,38 +26,20 @@ Graft gives your AI coding agent persistent context about your codebase. This tu
    graft init
    ```
 
-   `graft init` will:
-   - Ask which coding agents to wire up (Claude Code, Cursor, etc.)
-   - Build the `graft/` graph from your source code
-   - Drop hooks into your agent's config (e.g., `.claude/`)
-   - Add `graft/` to your `.gitignore`
+   `graft init` will ask which of your coding agents to wire up, build the `graft/` graph from your code, and drop a statusline and hooks into your agent's config (e.g. `.claude/`). From the next session on, Graft rides along in your coding agent: it pulls the matching nodes into each prompt and rebuilds the graph in the background after every turn. 
 
-   <Aside>
-   Run `graft init --dry-run` to preview every file it would touch before committing to anything.
-   </Aside>
+   Nothing is written until you pick. Run `graft init --dry-run` to see every file it would touch first, or `graft init --agents claude` to skip the prompt and wire Claude Code alone.
 
-3. **Verify the graph**
+   ![Graft rides along in a Claude Code session](/assets/graft-terminal.png)
 
-   ```bash
-   graft map
-   ```
+3. **Commit the wiring**
 
-   You should see a structural overview of your codebase — the nodes, systems, and links that Graft built.
-
-4. **Share with your team**
-
-   The wiring config (e.g., `.claude/`) is what you commit. The graph itself is a local regenerable cache:
+   `graft build` adds `graft/` to your `.gitignore` automatically — the graph is a local, regenerable cache (like `node_modules`), not something you commit. What you share is the wiring `init` dropped into `.claude/`; each teammate runs `graft build` to generate their own graph:
 
    ```bash
    git add .claude && git commit -m "wire in graft"
    ```
 
-   Each teammate runs `graft build` to generate their own local graph.
-
 </Steps>
 
-## What's next?
-
-- [Your First Graph](/tutorials/your-first-graph/) — Explore the generated graph with `graft grep`, `graft callers`, and more.
-- [CLI Reference](/reference/cli/) — Full list of all Graft commands.
-- [Why Graft Exists](/explanation/why-graft-exists/) — Understand the problem Graft solves.
+No daemon, no re-indexing to remember, nothing to run or maintain by default — the graph is just files.

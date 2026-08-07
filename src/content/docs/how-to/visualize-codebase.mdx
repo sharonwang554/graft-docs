@@ -1,27 +1,34 @@
 ---
-title: Visualize Your Codebase
-description: Generate visual representations of your codebase graph with graft viz.
-sidebar:
-  order: 6
+title: Visualize it (graft viz)
+description: Explore the graph visually with graft viz.
 ---
 
-Graft can generate visual representations of your codebase knowledge graph.
+`graft viz` opens a local, interactive view of both graphs — no install, no dev
+server; the viewer ships prebuilt inside the package.
 
-## Generate a visualization
+![graft viz — searching a symbol and jumping to it lights up its dependency graph](/assets/graft-viz-demo.gif)
+*search → jump to a node → dependency graph lights up*
 
-```bash
-graft viz
-```
+- **Context** tab — the architecture graph from `graft/*.md`. Nodes colored by
+  type, sized by connectedness.
+- **Code** tab — the per-symbol graph from `graft/.graph/wiring.json` (run `graft build` first).
+- **Outline** tab — the file → class → method hierarchy as a collapsible tree.
 
-This produces a visual graph showing the nodes, relationships, and structure that Graft has built from your codebase.
+Edges speak the code's language. Every link is one of a closed set of verbs, each
+answering a question someone building or reviewing code actually asks:
 
-## Use cases
+| Verb | The question it answers |
+|---|---|
+| `part_of` / `contains` | where does this live? |
+| `uses` / `calls` / `imports` / `depends_on` | what breaks if I change this? |
+| `produces` | where does this output come from? |
+| `configures` | what changes its behavior without a code change? |
+| `validates` | what checks or judges this? (tests, drift checks, scoring) |
+| `extends` / `implements` | what contract must this honor? |
 
-- **Onboarding**: Help new team members understand codebase architecture at a glance.
-- **Architecture reviews**: Visualize dependencies and relationships between subsystems.
-- **Documentation**: Export graph visuals for architecture docs and design documents.
-
-## See also
-
-- [Your First Graph](/tutorials/your-first-graph/) — Explore the graph with CLI tools.
-- [How the Graph Works](/explanation/how-the-graph-works/) — Understand what the graph represents.
+Select a node and its edges take on direction: **amber = what it depends on,
+teal = what depends on it**, with the verb written on each highlighted edge.
+Chips above the canvas filter by verb; tree-sitter-extracted edges draw solid
+while LLM-inferred ones draw dashed. The viewer live-reloads when `graft/`
+changes on disk. Older graphs with vague verbs (`influences`, `supports`) are
+normalized on load — no regeneration needed.

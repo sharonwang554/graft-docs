@@ -1,6 +1,8 @@
 # Graft Documentation Portal
 
-This repository contains the official documentation portal for **[Graft](https://github.com/NanoNets/Graft)** — the open-source context layer for AI coding agents.
+[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+
+This repository contains a community documentation portal for **[Graft](https://github.com/NanoNets/Graft)** — the open-source context layer for AI coding agents.
 
 The site is built with [Astro Starlight](https://starlight.astro.build/) and structured using the [Diataxis](https://diataxis.fr/) framework, organizing content into Tutorials, How-To Guides, Reference, and Explanation.
 

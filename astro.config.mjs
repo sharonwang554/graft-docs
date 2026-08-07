@@ -8,6 +8,9 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'Graft Docs',
+			components: {
+				Footer: './src/components/Footer.astro',
+			},
 			description: 'Documentation for Graft — persistent context layer for AI coding agents',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/NanoNets/Graft' },

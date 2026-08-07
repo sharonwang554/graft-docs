@@ -4,3 +4,22 @@
   --sl-color-accent: #546FFF;
   --sl-color-accent-high: #b8c4ff;
 }
+
+html[data-theme='light'] .dark-only {
+  display: none !important;
+}
+html[data-theme='dark'] .light-only {
+  display: none !important;
+}
+
+/* Fallback if data-theme is not set (e.g., initial load relying on OS preference) */
+@media (prefers-color-scheme: light) {
+  html:not([data-theme='dark']) .dark-only {
+    display: none !important;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme='light']) .light-only {
+    display: none !important;
+  }
+}

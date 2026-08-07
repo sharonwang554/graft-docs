@@ -1,0 +1,28 @@
+---
+import Default from '@astrojs/starlight/components/Footer.astro';
+import type { Props } from '@astrojs/starlight/props';
+---
+
+<Default {...Astro.props} />
+
+<div class="custom-footer">
+  &copy; {new Date().getFullYear()} <a href="https://sharonwang.me" target="_blank" rel="noopener noreferrer">Sharon Wang</a>
+</div>
+
+<style>
+  .custom-footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--sl-color-hairline);
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+  }
+  .custom-footer a {
+    color: var(--sl-color-text-accent);
+    text-decoration: none;
+  }
+  .custom-footer a:hover {
+    text-decoration: underline;
+  }
+</style>

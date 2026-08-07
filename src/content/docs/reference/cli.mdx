@@ -1,117 +1,120 @@
 ---
-title: CLI Commands
-description: Complete reference for all Graft CLI commands, flags, and options.
-sidebar:
-  order: 1
+title: CLI
+description: All graft commands and arguments.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+Graft's CLI provides tools for building, querying, visualizing, and managing your codebase graph. Method calls resolve through the receiver's type — constructor assignments (`self.router = APIRouter()`) and type annotations, not just the call-site name — so `callers`/`grep --in` return calls bound to the right type on method-heavy code, not every method anywhere with that name.
 
-## `graft init`
+## Build
 
-Initialize Graft in a repository. Detects installed coding agents, builds the graph, and wires hooks.
+### `graft build`
+Build `graft/` from the code at `[dir]`. Generates the wiring graph and per-file cards (no LLM, no key).
 
-```bash
-graft init [options]
-```
-
-| Flag | Description |
+| Option | Description |
 |---|---|
-| `--dry-run` | Preview every file that would be created or modified without writing anything. |
-| `--agents <name>` | Skip the agent selection prompt and wire a specific agent (e.g., `claude`). |
+| `--deep` | Add the LLM layer: concept nodes + per-symbol summary/crux (cached). |
+| `--extensions .ts .py` | Only include these code extensions. |
+| `--no-reuse` | Re-parse every file instead of replaying unchanged ones from cache. |
 
----
+## Query & Orient
 
-## `graft build`
+Query commands (`ask`, `skeleton`, `callers`, `grep`, `map`) automatically refresh the graph first if the working tree has moved. See [Verify & Refresh](#verify--refresh) for configuration.
 
-Build or rebuild the codebase graph.
+### `graft ask`
+Query the graph. Returns ranked nodes and exact file:line locations (no LLM, no key).
 
-```bash
-graft build [dir] [options]
-```
-
-| Flag | Description |
+| Option | Description |
 |---|---|
-| `--deep` | Enable LLM enrichment — adds per-symbol summaries, concept nodes, and crux insights. Requires provider credentials. |
-| `--extensions <ext...>` | Restrict build to specific file extensions (e.g., `.ts .py`). |
-| `--no-reuse` | Force a complete re-parse of all files, ignoring the content hash cache. |
-| `--provider <name>` | LLM provider for deep mode (`openai`, `anthropic`, `ollama`, `openrouter`, `google`). |
-| `--model <name>` | Model to use for deep mode. |
+| `<task>` | The query to search the graph for. |
+| `--json` | Return machine-readable JSON result. |
+| `--in <scope>` | Narrow to one sub-project of a monorepo/multi-repo folder. |
 
-<Aside>
-Without `--deep`, the build is deterministic tree-sitter parsing only. No API key or network access required.
-</Aside>
+### `graft skeleton`
+Print every signature in one file, no bodies. Provides the API surface for ~1/10th the tokens (no LLM, no key).
 
----
-
-## `graft map`
-
-Display a structural map of the repository — files, symbols, and edges.
-
-```bash
-graft map
-```
-
----
-
-## `graft grep`
-
-Search within the generated context graph.
-
-```bash
-graft grep <query>
-```
-
-Searches node descriptions and content, not just filenames.
-
----
-
-## `graft callers`
-
-Analyze call sites and callers for a specific symbol.
-
-```bash
-graft callers <symbol>
-```
-
----
-
-## `graft check`
-
-Verify graph health and check content hash validity.
-
-```bash
-graft check
-```
-
-Identifies stale nodes where source files have changed since the last build.
-
----
-
-## `graft mcp`
-
-Start the Graft Model Context Protocol (MCP) server.
-
-```bash
-graft mcp [dir]
-```
-
-Exposes the graph to any MCP-compatible agent.
-
----
-
-## `graft viz`
-
-Generate visual representations of the codebase graph.
-
-```bash
-graft viz
-```
-
----
-
-## Global options
-
-| Flag | Description |
+| Argument | Description |
 |---|---|
-| `--no-refresh` | Skip the automatic structural refresh before a query command. Also available as `GRAFT_NO_REFRESH=1`. |
+| `<file>` | The target file to analyze. |
+
+### `graft callers`
+Find who calls, references, imports, implements, or extends a symbol (no LLM, no key).
+
+| Option | Description |
+|---|---|
+| `<symbol>` | The symbol to find callers for. |
+| `--direction out` | The reverse: what the symbol itself calls/references (was `graft callees`). |
+| `-d N` | Walk transitively out to depth N — full blast radius (was `graft impact`). |
+
+### `graft grep`
+Exhaustive regex search over indexed files, grouped by enclosing symbol (no LLM, no key).
+
+| Option | Description |
+|---|---|
+| `"<regex>"` | The search pattern. |
+| `--in <path>` | Narrow to files at or under this path prefix. |
+| `-i --fixed` | Case-insensitive; treat the pattern as a literal string, not a regex. |
+
+### `graft map`
+Token-budgeted repo orientation — dir clusters, hubs, hotspots (no LLM, no key).
+
+| Option | Description |
+|---|---|
+| `--max-dirs N` | Raise/lower the maximum number of directories shown. |
+
+## Verify & Refresh
+
+### `graft check`
+Fail (exit 1) if `graft/` has drifted from the code. Never auto-refreshes — it's the drift report.
+
+| Option | Description |
+|---|---|
+| `--json` | Print the drift report as JSON. |
+
+### Refresh Configuration
+`ask`, `skeleton`, `callers`, `grep`, and `map` all refresh the graph first if the working tree moved. You can configure this behavior:
+
+| Setting | Description |
+|---|---|
+| `--no-refresh` | (Flag) Answer from the graph exactly as it is on disk. |
+| `GRAFT_NO_REFRESH=1` | (Environment Variable) Same, for every command. |
+| `GRAFT_REFRESH=hash` | (Environment Variable) Hash every file instead of trusting size+mtime. |
+
+## Visualize
+
+### `graft viz`
+See the graph: serves an interactive viewer on localhost.
+
+| Option | Description |
+|---|---|
+| `--port 5000` | Pick a specific port. |
+| `--no-open` | Don't auto-open the browser. |
+
+## Setup & Maintenance
+
+### `graft init`
+Pick which agents to wire. Prompts on a terminal; writes nothing until you choose.
+
+| Option | Description |
+|---|---|
+| `--dry-run` | List every file it would touch, then exit. |
+| `--agents <ids...>` | Wire only these agents, no prompt. IDs: `agents`, `cursor`, `gemini`, `copilot`, `kiro`, `windsurf`, `adal`, `claude`. |
+| `--yes` | No prompt; wire every detected agent. |
+| `--no-global` | Skip writes outside this repo (`~/.codex/` config + hooks). |
+| `--no-build` | Wire the files only; don't build the graph. |
+| `--all-agents` | Wire every known agent, detected or not. |
+| `--list-agents` | List known agent ids and exit. |
+
+### `graft version`
+Print the installed + latest published npm version.
+
+### `graft upgrade`
+`npm install -g` the latest published version.
+
+## Global Options
+
+These options can be appended to any command.
+
+| Option | Description |
+|---|---|
+| `--dir <path>` | Use a context dir other than `<repo>/graft`. |
+| `--version, -v` | Print the installed version and exit. |

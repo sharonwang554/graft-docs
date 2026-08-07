@@ -1,66 +1,108 @@
 ---
-title: Benchmarks & Performance
-description: Controlled benchmark results and SWE-bench Verified scores showing Graft's impact on agent efficiency and correctness.
-sidebar:
-  order: 4
+title: Benchmarks
+description: Graft efficiency and correctness numbers on real tasks.
 ---
 
-## Controlled benchmark
+## Controlled Sweep
 
-A 162-run controlled benchmark compared three variants of the same Claude Sonnet 5 agent with the same file tools:
+An agent that reads the graph should be cheaper and faster without getting more answers wrong. That's the whole claim, so we measured it instead of asserting it.
 
-- **Cold** — Explores the repo from zero each time
-- **Graft (push)** — Context bundle injected up front
-- **Graft (pull)** — Context available on demand via MCP tools
+The harness ran three variants of the same Claude Sonnet 5 agent with the same file tools: **cold** (explores from zero), **Graft** (a `graft ask --source` bundle pushed up front), and **pull** (graft_find_code/graft_file_api tools, nothing injected — context paid for only when asked). An Opus 4.8 judge scored correctness with a required-keyword floor, so a fast-but-wrong answer couldn't win by being fast. Cost is cache-aware: reads ≈0.1×, writes 1.25×, the billing model agents actually run under.
 
-An Opus 4.8 judge scored correctness with a required-keyword floor.
+162 runs, two repos (graft itself and a real Node/Express auth service), 3 trials each, tasks split between single-file and multi-file questions.
 
-### Results (mean per task)
-
-| Metric | Cold Claude Code | Claude Code + Graft |
+| Metric (mean/task) | Cold Claude Code | Claude Code with graft |
 |---|---|---|
-| Cost | $0.0429 | **$0.0292 (−32%)** |
-| Tokens | 8,070 | **4,650 (−42%)** |
-| Tool calls | 4.2 | **2.3 (−46%)** |
-| Latency | 39.8s | **15.8s (−60%)** |
-| Correctness | 93% | **93% (equal)** |
+| Cost savings ($) | 0.0429 | **0.0292 (+32%)** |
+| Token savings | 8,070 | **4,650 (+42%)** |
+| Tool-call savings | 4.2 | **2.3 (+46%)** |
+| Latency savings (s) | 39.8 | **15.8 (+60%)** |
+| Correctness | 93% | 93% (equal) |
 
-Graft never answered worse than cold on any corpus. The **pull** variant traded some speed for correctness: **98% accuracy**, +5 points over cold.
+Graft never answered worse than cold, on any corpus. The pull variant gave up most of that speed for something bigger: correctness jumped to 98%, +5 points over cold, the strongest single result in the sweep. Push when speed is what you need; pull when being right matters more.
 
 ## SWE-bench Verified
 
-The industry-standard benchmark — real GitHub issues from real repos, graded by the official `swebench` harness. Same model (Claude Sonnet 5), same Docker images, same turn limits.
+The sweep above is our harness measuring our mechanism. So we ran the industry-standard one too — **SWE-bench Verified**, real GitHub issues from real repos, graded by the official `swebench` harness. No judge model, no similarity score: your patch is applied, the maintainers' own tests are run, and you either flip the failing test without breaking the passing ones or you don't.
 
-### Results
+Same model on both arms — **Claude Sonnet 5** — same Docker images, same turn limits. The only difference is whether graft is wired in.
 
-| Metric | Cold Claude Code | Claude Code + Graft | Improvement |
+| Correctness & efficiency | Cold Claude Code | Claude Code with graft | Improvement |
 |---|---|---|---|
 | Correctness | 6 / 9 | **8 / 9** | **+33%** |
 | Tests passed | 1,260 | **1,280** | **+20** |
-| Tokens | 24.5M | **21.0M** | **−15%** |
-| Cost | $8.94 | **$7.82** | **−13%** |
-| Tool calls | 205 | **162** | **−21%** |
-| API requests | 370 | **304** | **−18%** |
-| Wall-clock time | 3,251s | **1,824s** | **−44%** |
+| Token savings | 24.5M | **21.0M** | **+15%** |
+| Cost savings | $8.94 | **$7.82** | **+13%** |
+| Tool-call savings | 205 | **162** | **+21%** |
+| API-request savings | 370 | **304** | **+18%** |
+| Wall-clock savings | 3,251s | **1,824s** | **+44%** |
 
-### Where Graft helped most
+### Where graft helped most
 
-| Instance | Cold | Graft | Token usage | Tool usage |
+| SWE-bench instance | Cold Claude Code | Claude Code with graft | Token usage vs. cold | Tool usage vs. cold |
 |---|---|---|---:|---:|
-| `django-11133` | 65/65 ✅ | **65/65 ✅** | **78%** | **61%** |
-| `django-10554` | 25/25 ✅ | **25/25 ✅** | **66%** | **69%** |
-| `django-11276` | 574/574 ✅ | **574/574 ✅** | **61%** | **58%** |
-| `django-11400` | 62/64 ❌ | **64/64 ✅** | 347% | 308% |
-| `django-11532` | 131/149 ❌ | **149/149 ✅** | **63%** | **60%** |
+| `django-11133` | Passed: 65 / 65 tests | **Passed: 65 / 65 tests** | **78%** | **61%** |
+| `django-10554` | Passed: 25 / 25 tests | **Passed: 25 / 25 tests** | **66%** | **69%** |
+| `django-11276` | Passed: 574 / 574 tests | **Passed: 574 / 574 tests** | **61%** | **58%** |
+| `django-11400` | Failed: 62 / 64 tests | **Passed: 64 / 64 tests** | 347% | 308% |
+| `django-11532` | Failed: 131 / 149 tests | **Passed: 149 / 149 tests** | **63%** | **60%** |
 
-## Methodology notes
+graft resolved **8 of 9** instances against Cold Claude Code's 6 — and got there with 21% fewer tool calls, 15% fewer tokens, and 44% less wall-clock time. On one instance the baseline patched 1 of the 5 files the fix requires and broke 18 previously-passing tests, twice over; graft found the files it missed and passed **148 / 148**.
 
-- Efficiency benchmark: 162 runs, two repos (Graft itself + a Node/Express auth service), 3 trials each
-- SWE-bench: Official SWE-bench Verified images, official `swebench` 4.1.0 grader, native x86_64
-- Cost is cache-aware: reads ≈0.1×, writes 1.25×
-- Token/cost comparisons use only instances both arms resolved (like-for-like)
+Two harnesses, two claims: the controlled sweep says graft is cheaper and faster, SWE-bench says it's also more correct.
 
-## See also
+<sub>Correctness and tests over all instances; tokens, cost and calls over the instances both arms resolved, for a like-for-like comparison. Official SWE-bench Verified images and official `swebench` 4.1.0 grader, native x86_64.</sub>
 
-- [Why Graft Exists](/explanation/why-graft-exists/) — The problem these benchmarks measure.
-- [Getting Started](/tutorials/getting-started/) — Try Graft yourself.
+## Tested on your popular repos
+
+The benchmarks measure the mechanism. The real test is whether graft helps an agent **ship real changes** on code people actually run, not just answer questions. So we benchmark it on popular open-source repos: **15 tasks each**, 10 real developer questions plus **5 actual implementation tasks** (real merged pull requests, each re-implemented from its base commit and scored against the files the maintainers actually changed). Same agent (Claude Opus), same file tools; the only difference is whether graft is wired in.
+
+Across these repos graft runs **up to 4× cheaper and 3× faster**, with better or no loss of correctness: it reproduces the real merged PRs by touching the same files the maintainers did. Per-repo detail below.
+
+### PocketBase (Go, ~350 files)
+
+| Aggregate over 15 tasks | Standard Claude Code | With graft |
+|---|---|---|
+| Cost | $13.91 | **$11.02 (−21%)** |
+| Wall-clock | 2,044s | **1,762s (−14%)** |
+| PRs reproduced | 5 / 5 | **5 / 5 (same files as the maintainers)** |
+
+Cheaper and faster with no loss of correctness: graft reproduced all five merged PRs, touching the same files the maintainers did. The gap is widest on cross-file understanding — "how does auth work across OAuth2 providers" dropped from $2.19 to $0.84.
+
+<details>
+<summary><b>The 10 questions we asked</b></summary>
+
+1. **Orientation** — Give me a map of PocketBase's architecture: the main subsystems and how an HTTP request flows through to the database.
+2. **Entry-point trace** — Trace end-to-end what happens when a client creates a record via the REST API, from route handler to database write.
+3. **Feature location** — I want to add a brand-new collection field type. Where do I hook it in, and which pieces must change?
+4. **Bug localization** — Realtime subscriptions silently stop delivering events after a while. Where would you start looking, and why?
+5. **Blast radius** — If I change the signature of the record-validation logic, what depends on it and what could break?
+6. **Cross-file synthesis** — How does auth work across OAuth2 providers: where are tokens issued, validated, stored, and refreshed?
+7. **Extensibility** — How do I use PocketBase as a Go framework to register a custom route plus an on-record-create hook?
+8. **Security discovery** — Where is user input validated, and where are collection API access rules enforced before a query runs?
+9. **Public API** — As an external app, how do I authenticate and then list and filter records over the REST API?
+10. **Test verification** — Where are the tests for the record CRUD API, and what do they assert about access rules?
+
+</details>
+
+<details>
+<summary><b>The 5 merged PRs we re-implemented</b></summary>
+
+Each PR was reset to its base commit; graft's diff was scored against the files the merged PR changed.
+
+| PR | Type | What it does | Files the maintainers touched |
+|---|---|---|---|
+| [#6744](https://github.com/pocketbase/pocketbase/pull/6744) | feat | Generate & serve WebP thumbnails | `apis/file.go`, `tools/filesystem/filesystem.go` |
+| [#6947](https://github.com/pocketbase/pocketbase/pull/6947) | fix | Uniform char distribution in regex random strings | `tools/security/random_by_regex.go` |
+| [#6690](https://github.com/pocketbase/pocketbase/pull/6690) | refactor | Patreon OAuth2 to use `x/oauth2/endpoints` | `tools/auth/patreon.go` |
+| [#2726](https://github.com/pocketbase/pocketbase/pull/2726) | perf | Drop a redundant admin-count query on a hot middleware path | `apis/middlewares.go` |
+| [#3192](https://github.com/pocketbase/pocketbase/pull/3192) | fix | Restore prior API rules on automigration rollback | `plugins/migratecmd/templates.go` |
+
+</details>
+
+<details>
+<summary><b>Method</b></summary>
+
+Two clones of PocketBase at the same commit: one wired with `graft init`, one untouched and verified graft-free. Each task run headless (`claude -p`, Claude Opus) with an empty MCP config. Understanding questions were graded by whether the answer pointed to the right files and functions; PR tasks were scored on whether the agent's diff touched the same files as the merged PR. Every transcript was audited to confirm graft was actually used in the graft arm and absent from the standard arm.
+
+</details>

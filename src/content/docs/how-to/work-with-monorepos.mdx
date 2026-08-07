@@ -1,39 +1,30 @@
 ---
-title: Work with Monorepos
-description: Use Graft with monorepos and multi-repo folder structures.
-sidebar:
-  order: 5
+title: Monorepos & multi-repo folders
+description: How Graft handles monorepos and nested structures.
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-Graft handles monorepos and multi-repo folders. You can scope builds to specific directories or file types.
+Graft handles two shapes without any config.
 
-## Build a specific directory
+## Monorepo with one `.git`
 
-```bash
-graft build ./packages/core
-```
+A single repo with `pnpm-workspace.yaml`/`package.json` `workspaces`, or per-package `go.mod`/`pyproject.toml`/`Cargo.toml`.
 
-This builds the graph for only the specified subdirectory.
+- `graft build` discovers each sub-project as a **ranking scope**
+- `ask`/`map` rank every scope on its own terms and fuse the results, so the biggest sub-project can't drown a small one
+- Hits carry `[scope/]` labels
+- `graft map` groups its directory clusters by scope first
 
-## Filter by file extension
+## Folder of separate git repos
 
-```bash
-graft build --extensions .ts .py
-```
+A folder of separate git repos (no `.git` at the top).
 
-Restrict the build to specific file types. Useful in polyglot repos where you only want to index certain languages.
-
-## Multiple repos in one folder
-
-If your workspace contains multiple repositories, run `graft init` in each one independently. Each repo gets its own `graft/` directory and its own graph.
+- `graft build` auto-splits: each child gets its own (git-ignored) `graft/`
+- The parent gets a `graft/workspace.json` index
+- Queries from the parent federate across every child, always labeled `<child>/`
+- Run `graft build` inside a child to work on just that repo
 
 <Aside type="tip">
-Combine directory scoping with extension filtering for precise control: `graft build ./packages/api --extensions .ts`
+Either way, narrow to one sub-project with `graft ask "<task>" --in <scope>/` once you know where you're working.
 </Aside>
-
-## See also
-
-- [CLI Reference](/reference/cli/) — Full `graft build` options.
-- [Supported Languages](/reference/supported-languages/) — All 20+ languages Graft can parse.

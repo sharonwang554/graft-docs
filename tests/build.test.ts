@@ -10,6 +10,7 @@ describe('Build', () => {
       cwd: ROOT,
       stdio: 'pipe',
       timeout: 120_000,
+      env: { ...process.env, ASTRO_TELEMETRY_DISABLED: '1' },
     });
 
     // If we got here without throwing, the build succeeded

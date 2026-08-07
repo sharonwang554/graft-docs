@@ -1,48 +1,42 @@
 ---
-title: Graph Structure
-description: Technical reference for the graft/ directory layout, wiring.json, and file organization.
-sidebar:
-  order: 3
+title: Graph structure
+description: What's in a node and what runs where.
 ---
 
-The `graft/` directory contains the complete knowledge graph of your codebase. It is a local, regenerable cache — like `node_modules` — and is excluded from git by default.
+import { Aside } from '@astrojs/starlight/components';
 
-## Directory layout
+## What's in a node
 
-```
-graft/
-├── *.md                    # Markdown node files (one per subsystem/concept)
-└── .graph/
-    └── wiring.json         # Per-symbol code graph (tree-sitter output)
-```
+A node is a single markdown file. Most code maps stop at an address: this thing lives in that file, on that line. That tells an agent where to look, not what it will find, so it still has to open the source and read. A Graft node holds the meaning inline, so the agent learns what it needs up front and opens the file only when it wants more.
 
-## Markdown node files
+### Node anatomy
 
-Each `.md` file in `graft/` represents a subsystem, API, or concept in your codebase. Graft groups files into a curated set of nodes rather than one-per-file, so a large repo becomes a few dozen readable nodes.
+| Part | What it holds |
+|---|---|
+| **Summary** | A plain-English explanation of what the code does, written by the model and cached. It is there whether or not the code was ever documented, and it is regenerated when the source changes. |
+| **Crux** | The handful of lines that actually carry the logic: the guard, the skip condition, the state change. Lifted straight from the source and stored inline, so the agent sees *how* it works, not just what. |
+| **Sources** | The exact files the node is built from, each tracked by a content hash, so Graft can tell precisely when a node has gone stale. |
+| **Links** | Typed connections to other nodes (`depends_on`, `part_of`, `uses`, `implements`, `produces`), written as `[[wikilinks]]` your agent can follow. |
+| **Notes** | Anything you write below the generated block. It is preserved across regenerations, so your own context is never overwritten. |
 
-Nodes contain:
-- Plain-English descriptions of what the subsystem does
-- Typed wikilinks to other nodes (e.g., `depends_on`, `implements`, `produces`)
-- Content hash for stale detection
+### Three depths in one file
 
-## Wiring graph (`wiring.json`)
+That is three depths in one file: the summary says *what* the code does, the crux shows *how*, and the sources point to the rest if the agent needs it. A plain index makes it read a whole file to learn one thing. A Graft node hands it the answer inline, and the follow-up read often never happens.
 
-The `graft/.graph/wiring.json` file is a per-symbol code graph built by tree-sitter:
-- Every function, class, and call edge
-- Deterministic — no model, no network
-- Used for `graft callers`, `graft grep`, and structural queries
+<Aside type="note">
+The crux is stored as the code itself, not as a line range, on purpose. Line numbers drift whenever unrelated code above them shifts, but the lines that matter do not. Keeping the text, not the numbers, means the crux stays correct even as the file around it moves.
+</Aside>
 
-## Content hashing
+*Summary, sources, links, and notes ship today in markdown nodes. The crux ships per-symbol in the code graph (`graft build --deep`); inlining it into markdown nodes is next.*
 
-Every file is tracked by SHA content hash. When you run `graft build`, only changed files are re-processed. The structural refresh (~3ms) that runs before query commands uses these hashes to detect staleness.
+## What runs where
 
-## Cache behavior
+| Layer | What happens | Requires |
+|---|---|---|
+| **On your machine** | The structural code graph: `graft build` (wiring graph + per-file cards), `graft check`, and `graft ask` are deterministic tree-sitter — they never call a model. | No key, no network |
+| **Through your provider key** | `graft build --deep` adds the concept nodes (file summaries + node synthesis) and the per-symbol summaries and cruxes. | Your `GRAFT_PROVIDER`, `GRAFT_API_KEY`, `GRAFT_MODEL` |
+| **No telemetry** | No analytics — the only network calls are the LLM requests you configured. | Nothing |
 
-- `graft build` — Incremental by default. Only re-parses changed files.
-- `graft build --no-reuse` — Forces a complete cold re-parse.
-- The `graft/` directory is added to `.gitignore` automatically by `graft init`.
-
-## See also
-
-- [Node Format](/reference/node-format/) — Structure of individual Markdown nodes.
-- [How the Graph Works](/explanation/how-the-graph-works/) — The two-pass build architecture.
+<Aside type="tip">
+Graft is vendor-neutral: set `GRAFT_PROVIDER` (`openai` for any OpenAI-compatible endpoint, or `anthropic` for the native API), your `GRAFT_API_KEY`, `GRAFT_MODEL`, and — for the `openai` wire format — `GRAFT_BASE_URL` to point at OpenRouter, Fireworks, Groq, a LiteLLM proxy, a local server, or OpenAI itself. Or pass `--provider/--model/--api-key/--base-url` on the command line.
+</Aside>

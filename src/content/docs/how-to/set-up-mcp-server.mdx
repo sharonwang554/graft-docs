@@ -1,52 +1,23 @@
 ---
-title: Set Up MCP Server
-description: Start Graft's Model Context Protocol server for agent integration.
-sidebar:
-  order: 2
+title: MCP server
+description: Registering Graft's MCP server with agents.
 ---
 
-import { Steps } from '@astrojs/starlight/components';
+`graft init` also registers Graft's MCP server with agents that support it, so these six tools appear natively, no shell required. Claude Code gets this too: `graft init` writes the server into the project's `.mcp.json` (restart Claude Code to load it). Skip with `--no-mcp`; run it manually with `graft mcp [dir]`.
 
-Graft can expose its graph via the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/), allowing any MCP-compatible agent to query codebase context.
-
-## Start the MCP server
-
-<Steps>
-
-1. **Build the graph first** (if you haven't already)
-
-   ```bash
-   graft build
-   ```
-
-2. **Start the server**
-
-   ```bash
-   graft mcp
-   ```
-
-   Or specify a directory:
-
-   ```bash
-   graft mcp ./my-project
-   ```
-
-3. **Connect your agent**
-
-   Point your MCP-compatible agent at the server. The agent can then query the graph using Graft's retrieval tools (`graft_find_code`, `graft_file_api`, etc.).
-
-</Steps>
-
-## Push vs. Pull
-
-Graft supports two modes of agent integration:
-
-| Mode | How it works | Best for |
+| Tool | Takes | What it's for |
 |---|---|---|
-| **Push** (Claude Code hooks) | Injects context into every prompt automatically | Speed — 60% less time, 46% fewer tool calls |
-| **Pull** (MCP server) | Agent requests context only when needed | Correctness — 98% accuracy (+5 points over cold) |
+| `graft_find_code` | a question | Ranked nodes with file:line, source inlined — usually the full answer, no follow-up read needed. |
+| `graft_file_api` | a file path | Every signature in that file, no bodies — the API surface for a tenth of the tokens. |
+| `graft_trace_calls` | a symbol | Who depends on it, or what it depends on with `direction: out`, N levels deep for blast radius. |
+| `graft_find_all` | a regex | Every hit, grouped by enclosing symbol, ranked by how coupled that symbol is. |
+| `graft_repo_map` | nothing | A first look at an unfamiliar repo: directory clusters, hubs, hotspots. |
+| `graft_check_freshness` | nothing | Whether the local graph has drifted from the code. |
 
-## See also
+Register it by hand if your agent needs it explicit:
 
-- [Integrate with Claude Code](/how-to/integrate-claude-code/) — The push-mode deep integration.
-- [CLI Reference](/reference/cli/) — Full `graft mcp` command options.
+```json
+{ "mcpServers": { "graft": { "command": "npx", "args": ["-y", "@nanonets/graft", "mcp"] } } }
+```
+
+Where a CLI agent supports user-level `hooks.json`, `init` also installs Graft's post-edit hook — blast-radius warnings and automatic `$0` graph re-sync after edits (skip with `--no-hooks`).

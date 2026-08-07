@@ -1,61 +1,46 @@
 ---
-title: How the Graph Works
-description: Architecture of Graft's two-pass build — tree-sitter structural parsing and optional LLM enrichment.
+title: How the graph works
+description: The architecture and passes behind the Graft builder.
 sidebar:
   order: 2
 ---
 
-## Two-pass architecture
+import { Aside } from '@astrojs/starlight/components';
 
-Graft builds the graph in two passes:
+## Two passes
 
-### Tier 1: Tree-sitter (structural, deterministic)
+Graft builds the graph in two passes, both powered by a language model:
 
-Every source file is parsed with [tree-sitter](https://tree-sitter.github.io/) to extract:
+1. **Read each file.** Every source file is summarized once into a short description of what it does.
+2. **Group into nodes.** Those summaries are grouped into a curated set of nodes (subsystems, key files, and concepts) with typed links between them. Graft chooses the right level of detail for you instead of making one node per file, so a big repo becomes a few dozen readable nodes.
 
-- Functions, classes, and interfaces
-- Call edges and dependency relationships
-- Import/export structure
+![Graft Architecture flow from source files to markdown nodes](/assets/graft-architecture.svg)
 
-This produces `graft/.graph/wiring.json` — the per-symbol code graph. It is:
+## Caching
 
-- **Deterministic** — same input always produces the same output
-- **Free** — no API key, no network, no cost
-- **Fast** — pure parsing, runs in milliseconds
+Every pass is cached by content hash — the LLM ones and the tree-sitter parse alike. Re-running only touches the files that changed, so the second build is fast and cheap:
 
-This is what `graft build` (without `--deep`) produces.
-
-### Tier 2: LLM enrichment (optional, `--deep`)
-
-The `--deep` flag adds two LLM passes:
-
-1. **Pass 1** — Each source file is summarized into a short description
-2. **Pass 2** — Summaries are grouped into curated nodes with typed links
-
-Graft chooses the right level of detail — a big repo becomes a few dozen readable nodes, not one per file.
-
-## Content hashing and incremental builds
-
-Every pass is cached by content hash — both the LLM summaries and the tree-sitter parse. Re-running only touches the files that changed:
-
-| Scenario | Time (124-file repo) |
+| Scenario | Time |
 |---|---|
-| Cold build | 0.74s |
-| One file changed | 0.18s |
+| Cold build (124 files) | 0.74s |
+| One edited file | 0.18s |
 | Nothing changed | 0.18s |
 
-## Automatic refresh before queries
+`graft build --no-reuse` forces a cold re-parse.
 
-Every query command (`graft grep`, `graft callers`, `graft map`, etc.) runs a structural refresh before answering:
+## Auto-refresh
 
-1. Stats the tree against the last build's fingerprint (~3ms)
-2. Rebuilds only if something moved
-3. Catches uncommitted, unstaged, and staged changes (Graft never reads git)
+That cheapness is what lets **every query refresh the graph before it answers**. A retrieval call stats the tree against the last build's fingerprint (~3ms), and rebuilds only if something moved — so `ask`/`grep`/`callers`/`skeleton`/`map` describe the code as it is right now, including edits that are unsaved to git: uncommitted, unstaged, or staged all look the same to graft, which never reads git at all.
 
-The refresh is structural and costs $0 — it never calls the LLM. Disable with `--no-refresh` or `GRAFT_NO_REFRESH=1`.
+<Aside type="note">
+The refresh is structural and $0; it never calls the LLM. Turn it off per-command with `--no-refresh`, or everywhere with `GRAFT_NO_REFRESH=1`.
+</Aside>
 
-## See also
+## The code graph
 
-- [Enable Deep Mode](/how-to/enable-deep-mode/) — How to run the LLM-enriched build.
-- [Graph Structure](/reference/graph-structure/) — Technical details of `graft/` directory.
-- [Architecture Decisions](/explanation/architecture-decisions/) — Why this design.
+Alongside the markdown graph, `graft build` builds `graft/.graph/wiring.json` — a per-symbol code graph — plus a per-file wiring card mirroring your source tree.
+
+| Tier | What it produces | Requires |
+|---|---|---|
+| **Tier 1** (tree-sitter) | Every function, class, and call edge; deterministic | No model, no network |
+| **`--deep`** (LLM) | One-line summary and a crux excerpt per symbol, cached by body hash | Provider key |
