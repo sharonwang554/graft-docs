@@ -8,10 +8,14 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'Graft Docs',
+			customCss: [
+				'./src/styles/custom.css',
+			],
 			components: {
 				Footer: './src/components/Footer.astro',
 			},
 			description: 'Documentation for Graft — persistent context layer for AI coding agents',
+			lastUpdated: true,
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/NanoNets/Graft' },
 			],
@@ -19,7 +23,7 @@ export default defineConfig({
 				{
 					label: 'Tutorials',
 					items: [
-						{ label: 'Getting Started', slug: 'tutorials/getting-started' },
+						{ label: 'Quick Start', slug: 'tutorials/quick-start' },
 						{ label: 'Your First Graph', slug: 'tutorials/your-first-graph' },
 					],
 				},

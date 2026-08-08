@@ -46,15 +46,18 @@ Run `graft init --dry-run` first to preview every file that would be created or 
 
 ## How it works under the hood
 
-The hooks in `.claude/` tell Claude Code to:
+`graft init` always wires up Claude Code, and Claude Code gets more than the skill file above. From then on, any Claude Code session opened in the repo gets:
 
-1. Inject the relevant `graft/` nodes as context before each prompt
-2. Run a lightweight structural refresh (~3ms) after each turn to detect file changes
-3. Rebuild only the changed nodes (the LLM is never called during refresh — it's pure tree-sitter)
+- **a live statusline** — graph size, % enriched, and a `⚠ N stale` warning when the code has moved ahead of the graph
+- **auto-sync** — every graft query brings the graph up to date first, so an answer always describes the code as it is right now, uncommitted edits included. A query refreshes only what it reads; the markdown under `graft/` is refreshed by the background rebuild at the end of a turn that touched code. Both are structural and `$0` — auto-sync never calls the LLM on its own
+- **context on tap** — each prompt pulls the matching nodes into the session; editing a file surfaces what depends on it ("blast radius"); new sessions start with the repo map
 
-![graft's post-edit hook](/assets/graft-hook-blast-radius-demo.gif)
-*Edit a file → blast radius appears inline → graph auto-resyncs → confirmed in `graft viz`*
+<p align="center">
+  <img src="/assets/graft-hook-blast-radius-demo.gif" alt="graft's post-edit hook: editing node-file.ts prints its blast radius (who depends on it) inline, the statusline flips stale → syncing → synced on its own, and the same dependents light up in graft viz" width="820"/>
+  <br/><sub>edit a file → blast radius appears inline → graph auto-resyncs → confirmed in <code>graft viz</code></sub>
+</p>
 
+`graft init` is idempotent and never clobbers your existing `.claude/settings.json` — it merges its blocks and leaves the rest alone. Want the LLM summaries too? Run `graft build --deep` (with a key) whenever you like; auto-sync will never do it for you.
 ## See also
 
 - [Set Up MCP Server](/how-to/set-up-mcp-server/) — Alternative integration via the Model Context Protocol.

@@ -9,9 +9,11 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## The problem
 
-A code map is supposed to tell an agent what it needs to know so it doesn't have to read every file. But standard RAG just returns excerpts of source code, and plain embeddings lose the structure — who calls what, what depends on what. 
+Every task, your coding agent starts blind. Before it changes anything, it re-explores the repo: grep a term, open a file, follow an import, back out, try again. It is rebuilding a picture of a codebase it mapped an hour ago and threw away. That rediscovery burns most of a run's tool calls, tokens, and latency, and it is pure overhead:
 
-So the agent still has to write a script or use `grep` to figure out how things wire together, blowing through its token budget and your time as it wanders the repo.
+- Repeated. Every task pays the exploration cost again, from zero.
+- Discarded. Whatever the agent figured out dies with the session.
+- Unshared. The next teammate, and their agent, start from scratch too.
 
 <Aside type="note">
 Humans onboard to a codebase once. Agents onboard every single time.
@@ -21,17 +23,13 @@ Humans onboard to a codebase once. Agents onboard every single time.
 
 ## What Graft does
 
-Graft solves this by writing the map down instead of leaving it in an opaque vector database. It uses `tree-sitter` (the same C-based parser behind syntax highlighting in your editor) to parse the AST of every file. It extracts every function, class, and method, resolves where they are called from across the entire codebase, and maps the dependencies.
+Graft builds that understanding once and writes it into your repo as a folder of linked markdown files, one node per system, API, or concept.
 
-Then it hands those files to an LLM to summarize what they do.
-
-The result is a graph of nodes — one node per subsystem or key concept — connected by typed links (`depends_on`, `uses`, `implements`), all saved as plain markdown files in a `graft/` directory.
-
-When an agent needs context, it isn't guessing which files to read. It enters the graph at a relevant node, reads the summary, and follows the links directly to the dependencies it actually needs.
-
-<Aside type="tip">
-**Your provider, your key, your model.** Summaries are written by any provider you choose — OpenAI, Anthropic (native), OpenRouter, Fireworks, Groq, a LiteLLM proxy, or a local model — under your own key. The structural code graph (`graft build`, `graft check`) is deterministic tree-sitter and never calls a model at all.
-</Aside>
+- Real explanations, not a list of symbols. Each node says, in plain English, what a part of the system does and how it connects to the rest, the way a senior engineer would explain it. That is the part an agent actually needs so it can skip the exploration. It is not a dump of function names.
+- A real graph you can read. No embeddings, no similarity search, no index to keep warm. The graph is a set of linked files your agent opens, greps, and follows, exactly the way it reads any other file in the repo.
+- Grafted into git. The graph is just files in graft/. Commit it, and anyone who clones the repo has it. No database, no server, no setup. Git does the syncing, and a stale graph shows up as a diff in review instead of rotting in some external store.
+- The diff lives with the code. When a change moves things around, you see it in the graph diff in the same pull request, right next to the code that caused it.
+- **Your provider, your key, your model.** Summaries are written by any provider you choose — OpenAI, Anthropic (native), OpenRouter, Fireworks, Groq, a LiteLLM proxy, or a local model — under your own key. The structural code graph (`graft build`, `graft check`) is deterministic tree-sitter and never calls a model at all.
 
 <div class="light-only">
 

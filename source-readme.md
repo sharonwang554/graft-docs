@@ -1,9 +1,3 @@
-# Graft Documentation
-
-This file provides the complete Graft documentation for AI agents.
-
----
-
 <div align="center">
 
 <img src="assets/graft-hero.png" alt="Graft — open-source context layer for large codebases" width="100%"/>

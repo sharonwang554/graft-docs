@@ -1,0 +1,57 @@
+---
+title: Agent Integration
+description: Learn how to wire Graft into your coding agents with a single command.
+sidebar:
+  order: 2
+---
+
+One command wires Graft into the coding agents you use:
+
+```bash
+npx @nanonets/graft init
+# detects your agents and writes each one's native instruction file;
+# Claude Code additionally gets the live statusline + hooks below
+```
+
+On a terminal, `init` shows you every agent it knows about, flags the ones it detected, and lists the files it will write. You choose which to wire. Claude Code is pre-selected.
+
+Depending on the agent, Graft either writes a marker-fenced section into a shared instruction file, or generates a wholly-owned rule/skill file:
+
+| Agent | Wiring Strategy | File Path |
+| --- | --- | --- |
+| **Codex / OpenCode** | Shared instruction file | `AGENTS.md` |
+| **Gemini** | Shared instruction file | `GEMINI.md` |
+| **GitHub Copilot** | Shared instruction file | `.github/copilot-instructions.md` |
+| **Claude Code** | Wholly-owned skill file | `.claude/skills/graft/SKILL.md` |
+| **Cursor** | Wholly-owned rule file | `.cursor/rules/graft.mdc` |
+| **Windsurf** | Wholly-owned rule file | `.windsurf/rules/graft.md` |
+| **Kiro** | Wholly-owned steering file | `.kiro/steering/graft.md` |
+| **AdaL** | Wholly-owned skill file | `.adal/skills/graft/SKILL.md` |
+
+**Note**: Re-running `init` safely updates Graft's own section (or replaces its owned file) without touching the rest of your content. For Claude Code, it writes its own skill file and never touches your existing `CLAUDE.md`.
+
+With no TTY to prompt on — CI, a Dockerfile, a piped shell — `init` writes nothing and prints the command to run instead. Pass `--agents <ids>` or `--yes` to make a scripted run explicit.
+
+| Flag | Effect |
+| --- | --- |
+| `--agents <ids...>` | wire only these, no prompt — ids: `agents`, `cursor`, `gemini`, `copilot`, `kiro`, `windsurf`, `adal`, `claude` |
+| `--yes`, `-y` | skip the prompt and wire every detected agent |
+| `--dry-run` | print every file `init` would touch, then exit without writing |
+| `--all-agents` | write instruction files for every known agent, detected or not |
+| `--no-agents` | Claude Code wiring only; skip other agents |
+| `--list-agents` | print the known agent ids and exit |
+| `--no-mcp` | skip MCP server registration |
+| `--no-hooks` | skip hook installation |
+| `--no-global` | skip writes outside this repo (the `~/.codex/` entries below) |
+
+## Writes outside the repo
+
+Selecting the agents host also touches your user-level Codex config, when `~/.codex/` exists:
+
+| Path | What changes |
+| --- | --- |
+| `~/.codex/config.toml` | registers the Graft MCP server (`[mcp_servers.graft]`) |
+| `~/.codex/hooks/graft/graft-hooks.cjs` | the post-edit hook shim |
+| `~/.codex/hooks.json` | a `PostToolUse` entry matching `Write\|Edit\|MultiEdit` |
+
+Both configs are user-level, so they apply to every repo you open with Codex, not just this one. The picker labels these machine-wide, `--dry-run` lists them in their own section, and `--no-global` skips them while still wiring `AGENTS.md`.
