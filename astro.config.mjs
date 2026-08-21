@@ -13,6 +13,7 @@ export default defineConfig({
 			],
 			components: {
 				Footer: './src/components/Footer.astro',
+				Head: './src/components/Head.astro',
 			},
 			description: 'Documentation for Graft — persistent context layer for AI coding agents',
 			lastUpdated: true,
