@@ -3,6 +3,7 @@ import starlight from '@astrojs/starlight';
 import vercel from '@astrojs/vercel';
 
 export default defineConfig({
+	site: 'https://graft.sharonwang.me',
 	output: 'static',
 	adapter: vercel(),
 	integrations: [
