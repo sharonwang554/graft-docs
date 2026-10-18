@@ -1,0 +1,14 @@
+---
+title: "What stays on your machine"
+description: "Your code. The graft map is built on your machine with tree-sitter. No model, no network."
+sidebar:
+  order: 6
+---
+
+- **Your code.** The graft map is built on your machine with tree-sitter. No model, no network. The optional `trail build --deep` summaries go to the model provider you choose, under your own key.
+- **Personal learnings.** Kept in `~/.trail`. Never committed, never uploaded.
+- **Repo learnings.** Files in your repo, shared through git like any other file.
+- **Your past sessions.** `trail init` reads your own messages from Claude Code's transcripts for the repo, on your machine. Your own Claude Code does the reading, with Claude Sonnet under your login, so your messages go only to Anthropic, and it counts toward your Claude usage. None of it goes to Trail.
+- **Your PR reviews.** When `gh` is installed and signed in, `trail init` reads the review comments on the repo's last 50 merged PRs with it, under your GitHub login. Anything that looks like a secret is taken out, and your own Claude Code reads them the same way. None of it goes to Trail.
+- **If you connect a Trail workspace.** No learning goes to Trail until you do. Once connected, the learnings in the repos you picked go to Trail, including those on teammates' pushed branches. So does a record of each search and check that used them: the search text, the files, and whose learnings were shown. That is how the team page counts reuse.
+- **Anonymous usage stats.** Buckets and fixed labels only, never the title, text or paths of a learning. [`TELEMETRY.md`](https://github.com/trailhq/Trail-Code/blob/main/TELEMETRY.md) lists every field. Turn it off with `trail telemetry disable` or `DO_NOT_TRACK=1`.

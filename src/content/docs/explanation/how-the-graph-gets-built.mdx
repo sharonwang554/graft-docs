@@ -1,46 +1,19 @@
 ---
-title: How the graph gets built
-description: The architecture and passes behind the Graft builder.
+title: "How the graph gets built"
+description: "The graft map is built in layers."
 sidebar:
-  order: 2
+  order: 4
 ---
 
-import { Aside } from '@astrojs/starlight/components';
-
-## Two passes
-
-Graft builds the graph in two passes, both powered by a language model:
+The graft map is built in layers. Tier 1 is tree-sitter: every symbol and call edge, no model, no key. `trail build --deep` adds two language-model passes on top:
 
 1. **Read each file.** Every source file is summarized once into a short description of what it does.
-2. **Group into nodes.** Those summaries are grouped into a curated set of nodes (subsystems, key files, and concepts) with typed links between them. Graft chooses the right level of detail for you instead of making one node per file, so a big repo becomes a few dozen readable nodes.
+2. **Group into nodes.** Those summaries are grouped into a curated set of nodes (subsystems, key files, and concepts) with typed links between them. The graft map chooses the right level of detail for you instead of making one node per file, so a big repo becomes a few dozen readable nodes.
 
-![Graft Architecture flow from source files to markdown nodes](/assets/graft-architecture.svg)
+![Source files flow to Tier 1: tree-sitter, which writes graft/.graph/wiring.json, and to Pass 1: LLM summarizes each file (--deep), then Pass 2: group into nodes + typed links, which writes graft/*.md](/assets/graft-architecture.svg)
 
-## Caching
+Every pass is cached by content hash, the LLM ones and the tree-sitter parse alike. Re-running only touches the files that changed, so the second build is fast and cheap (on this repo, 312 files: about 5s cold, about 0.6s after one edited file or with nothing changed). `trail build --no-reuse` forces a cold re-parse.
 
-Every pass is cached by content hash — the LLM ones and the tree-sitter parse alike. Re-running only touches the files that changed, so the second build is fast and cheap:
+That cheapness is what lets **every query refresh the graph before it answers**. A retrieval call stats the tree against the last build's fingerprint (about 50ms on this repo), and rebuilds only if something moved, so `ask`/`grep`/`callers`/`skeleton`/`map` describe the code as it is right now, including edits that are unsaved to git: uncommitted, unstaged, or staged all look the same to the graft map. Git determines the visible file set; freshness compares the working-tree bytes rather than commit or index state. The refresh is structural and `$0`; it never calls the LLM. Turn it off per-command with `--no-refresh`, or everywhere with `GRAFT_NO_REFRESH=1`.
 
-| Scenario | Time |
-|---|---|
-| Cold build (124 files) | 0.74s |
-| One edited file | 0.18s |
-| Nothing changed | 0.18s |
-
-`graft build --no-reuse` forces a cold re-parse.
-
-## Auto-refresh
-
-That cheapness is what lets **every query refresh the graph before it answers**. A retrieval call stats the tree against the last build's fingerprint (~3ms), and rebuilds only if something moved — so `ask`/`grep`/`callers`/`skeleton`/`map` describe the code as it is right now, including edits that are unsaved to git: uncommitted, unstaged, or staged all look the same to graft, which never reads git at all.
-
-<Aside type="note">
-The refresh is structural and $0; it never calls the LLM. Turn it off per-command with `--no-refresh`, or everywhere with `GRAFT_NO_REFRESH=1`.
-</Aside>
-
-## The code graph
-
-Alongside the markdown graph, `graft build` builds `graft/.graph/wiring.json` — a per-symbol code graph — plus a per-file wiring card mirroring your source tree.
-
-| Tier | What it produces | Requires |
-|---|---|---|
-| **Tier 1** (tree-sitter) | Every function, class, and call edge; deterministic | No model, no network |
-| **`--deep`** (LLM) | One-line summary and a crux excerpt per symbol, cached by body hash | Provider key |
+Alongside the markdown graph, `trail build` builds `graft/.graph/wiring.json` (a per-symbol code graph) plus a per-file wiring card mirroring your source tree. Tier 1 is pure tree-sitter (every function, class, and call edge; deterministic, no model, no network), which is why plain `trail build` needs no key. The `--deep` pass adds a one-line summary and a crux excerpt per symbol, cached by body hash.

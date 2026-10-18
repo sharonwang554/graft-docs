@@ -1,4 +1,4 @@
-/* Graft Docs custom styles */
+/* Trail-code Docs custom styles */
 :root {
   --sl-color-accent-low: #1a1a2e;
   --sl-color-accent: #546FFF;
@@ -10,6 +10,36 @@ html[data-theme='light'] .dark-only {
 }
 html[data-theme='dark'] .light-only {
   display: none !important;
+}
+
+/* Landing page: stack the hero so the wide README banner spans the full width */
+.hero {
+  grid-template-columns: 100%;
+  padding-block: 1.5rem 2.5rem;
+}
+.hero > .hero-html {
+  order: 0;
+  width: 100%;
+}
+.hero .stack {
+  text-align: center;
+}
+.hero .copy,
+.hero .actions {
+  align-items: center;
+  justify-content: center;
+}
+.hero-html img {
+  width: 100%;
+  height: auto;
+}
+
+/* README badge row: keep the shields on one wrapping line, as on GitHub */
+.sl-markdown-content div[align='center'] > p:has(img) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem;
 }
 
 /* Fallback if data-theme is not set (e.g., initial load relying on OS preference) */

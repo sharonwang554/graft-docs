@@ -5,26 +5,38 @@ import vercel from '@astrojs/vercel';
 export default defineConfig({
 	output: 'static',
 	adapter: vercel(),
+	// Pages from the Graft-era site, mapped to where their content lives now.
+	redirects: {
+		'/tutorials/your-first-graph': '/how-to/search-and-orient/',
+		'/how-to/integrate-claude-code': '/how-to/agent-integration/',
+		'/how-to/set-up-mcp-server': '/how-to/agent-integration/',
+		'/how-to/configure-providers': '/reference/what-runs-where/',
+		'/how-to/enable-deep-mode': '/explanation/how-the-graph-gets-built/',
+		'/reference/environment-variables': '/reference/what-runs-where/',
+		'/reference/graph-structure': '/reference/whats-in-a-node/',
+		'/explanation/why-graft-exists': '/explanation/graft-map/',
+		'/explanation/architecture-decisions': '/explanation/how-it-works/',
+	},
 	integrations: [
 		starlight({
-			title: 'Graft Docs',
+			title: 'Trail-code Docs',
 			customCss: [
 				'./src/styles/custom.css',
 			],
 			components: {
+				Banner: './src/components/Banner.astro',
 				Footer: './src/components/Footer.astro',
 			},
-			description: 'Documentation for Graft — persistent context layer for AI coding agents',
+			description: 'The self-learning context layer for coding agents.',
 			lastUpdated: true,
 			social: [
-				{ icon: 'github', label: 'GitHub', href: 'https://github.com/NanoNets/Graft' },
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/trailhq/Trail-Code' },
 			],
 			sidebar: [
 				{
 					label: 'Tutorials',
 					items: [
-						{ label: 'Quick Start', slug: 'tutorials/quick-start' },
-						{ label: 'Your First Graph', slug: 'tutorials/your-first-graph' },
+						{ label: 'Quick start', slug: 'tutorials/quick-start' },
 					],
 				},
 				{

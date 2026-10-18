@@ -1,0 +1,13 @@
+---
+title: "What runs where"
+description: "On your machine, no key, no network: the structural code graph. Through your provider key: the LLM-written parts."
+sidebar:
+  order: 5
+---
+
+- **On your machine, no key, no network:** the structural code graph. `trail build` (wiring graph + per-file cards), `trail build --check`, `trail ask`, learnings and `trail check` are deterministic. They never call a model.
+- **Through your provider key:** the LLM-written parts. `trail build --deep` adds the concept nodes (file summaries + node synthesis) and the per-symbol summaries and cruxes. The graft map is vendor-neutral: set `GRAFT_PROVIDER` (`openai` for any OpenAI-compatible endpoint, `anthropic` for the native API, or `litellm` / `orcarouter` for a gateway that speaks the OpenAI-compatible format), your `GRAFT_API_KEY`, `GRAFT_MODEL`, and, for the `openai` wire format, `GRAFT_BASE_URL` to point at OpenRouter, Fireworks, Groq, a LiteLLM proxy, a local server, or OpenAI itself. Or pass `--provider/--model/--api-key/--base-url` on the command line. (`OPENROUTER_API_KEY` still works as a deprecated fallback, and `ORCAROUTER_API_KEY` as a second one.)
+- **Through Trail, only if you connect a workspace:** the learnings in the repos you picked, and the searches and checks that used them. See [What stays on your machine](/reference/what-stays-on-your-machine/).
+- **Anonymous usage stats:** a daily npm version check and one batched usage ping. The ping carries buckets and fixed labels only: never your code, file paths, repo name, symbols, queries, learnings or error messages. [`TELEMETRY.md`](https://github.com/trailhq/Trail-Code/blob/main/TELEMETRY.md) is the complete list and `trail telemetry debug` prints exactly what your machine would send. Turn it off with `trail telemetry disable`, `DO_NOT_TRACK=1`, or by unchecking the box in `trail init`; it is off in CI and in any build from source.
+
+Settings keep their `GRAFT_` names. See [`.env.example`](https://github.com/trailhq/Trail-Code/blob/main/.env.example) for the full list (model, base URL, graph directory).

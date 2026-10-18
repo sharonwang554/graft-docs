@@ -1,106 +1,83 @@
 ---
-title: Benchmarks
-description: Graft efficiency and correctness numbers on real tasks.
+title: "Benchmark"
+description: "An agent that reads the graft map should be cheaper and faster without getting more answers wrong."
+sidebar:
+  order: 5
 ---
 
-## Controlled Sweep
+An agent that reads the graft map should be cheaper and faster without getting more answers wrong. That's the whole claim, so we measured it instead of asserting it.
 
-An agent that reads the graph should be cheaper and faster without getting more answers wrong. That's the whole claim, so we measured it instead of asserting it.
+The harness ran three variants of the same agent loop on Claude Sonnet 5, with the same file tools: **cold** (explores from zero), **push** (a `trail ask --source` bundle up front), and **pull** (the `trail_find_code` and `trail_file_api` tools, nothing injected, context paid for only when asked). An Opus 4.8 judge scored correctness with a required-keyword floor, so a fast but wrong answer couldn't win by being fast. Cost is cache-aware: reads ≈0.1×, writes 1.25×, the billing model agents actually run under.
 
-The harness ran three variants of the same Claude Sonnet 5 agent with the same file tools: **cold** (explores from zero), **Graft** (a `graft ask --source` bundle pushed up front), and **pull** (graft_find_code/graft_file_api tools, nothing injected — context paid for only when asked). An Opus 4.8 judge scored correctness with a required-keyword floor, so a fast-but-wrong answer couldn't win by being fast. Cost is cache-aware: reads ≈0.1×, writes 1.25×, the billing model agents actually run under.
+162 runs, two repos (this one and a real Node/Express auth service), 3 trials each, tasks split between single-file and multi-file questions.
 
-162 runs, two repos (graft itself and a real Node/Express auth service), 3 trials each, tasks split between single-file and multi-file questions.
-
-| Metric (mean/task) | Cold Claude Code | Claude Code with graft |
+| Metric (mean/task) | Cold agent | Agent with the graft map (push) |
 |---|---|---|
-| Cost savings ($) | 0.0429 | **0.0292 (+32%)** |
-| Token savings | 8,070 | **4,650 (+42%)** |
-| Tool-call savings | 4.2 | **2.3 (+46%)** |
-| Latency savings (s) | 39.8 | **15.8 (+60%)** |
+| Cost ($) | 0.0429 | **0.0292 (32% lower)** |
+| Uncached input tokens | 8,070 | **4,650 (42% fewer)** |
+| Tool calls | 4.2 | **2.3 (46% fewer)** |
+| Latency (s) | 39.8 | **15.8 (60% less)** |
 | Correctness | 93% | 93% (equal) |
 
-Graft never answered worse than cold, on any corpus. The pull variant gave up most of that speed for something bigger: correctness jumped to 98%, +5 points over cold, the strongest single result in the sweep. Push when speed is what you need; pull when being right matters more.
+Push, the column above, gave up 3 correctness points on one corpus for its savings. The pull variant never answered worse than cold on any corpus, and gave up most of that speed for something bigger: correctness jumped to 98%, 5 points over cold, the strongest single result in the sweep. Push when speed is what you need; pull when being right matters more.
 
 ## SWE-bench Verified
 
-The sweep above is our harness measuring our mechanism. So we ran the industry-standard one too — **SWE-bench Verified**, real GitHub issues from real repos, graded by the official `swebench` harness. No judge model, no similarity score: your patch is applied, the maintainers' own tests are run, and you either flip the failing test without breaking the passing ones or you don't.
+The sweep above is our harness measuring our mechanism. So we ran the industry-standard one too: **SWE-bench Verified**, real GitHub issues from real repos, graded by the official `swebench` harness. No judge model, no similarity score: your patch is applied, the maintainers' own tests are run, and you either flip the failing test without breaking the passing ones or you don't.
 
-Same model on both arms — **Claude Sonnet 5** — same Docker images, same turn limits. The only difference is whether graft is wired in.
+**50 instances**, the same model on both arms (**Claude Sonnet 5**), the same Docker images, the same turn limits. The only difference is whether the graft map is wired in.
 
-| Correctness & efficiency | Cold Claude Code | Claude Code with graft | Improvement |
+| Correctness & efficiency | Cold Claude Code | Claude Code with the graft map | Improvement |
 |---|---|---|---|
-| Correctness | 65% of instances tested | **75% of instances tested** | **+10 pts** |
-| Tests passed | 2,618 | **2,628** | **+10** |
-| Token savings | 45.6M | **36.9M** | **+19%** |
-| Cost savings | $16.34 | **$13.93** | **+15%** |
-| Tool-call savings | 388 | **288** | **+26%** |
-| API-request savings | 697 | **524** | **+25%** |
-| Wall-clock savings | 4,424s | **2,995s** | **+32%** |
+| Correctness | 27 / 50 (54%) | **33 / 50 (66%)** | **+12 pts** |
+| Tokens | 142.0M | **109.4M** | **23% fewer** |
+| Cost | $52.34 | **$42.43** | **19% lower** |
+| Tool calls | 1,370 | **1,031** | **25% fewer** |
+| API requests | 2,455 | **1,875** | **24% fewer** |
+| Wall-clock | 13,094s | **8,922s** | **32% less** |
 
-### Where graft fixed what cold missed
+The graft map resolved **33 of 50 instances** against cold Claude Code's 27, with 25% fewer tool calls, 23% fewer tokens and 32% less wall-clock time. Every correctness win has the same shape: the baseline patches one file and misses its siblings. On `django-11532` it patched 1 of the 5 files the fix requires and broke 18 previously passing tests, twice over. On `django-16263` it patched 1 of 4 and scored 102 / 103. The graft map found the rest, and on `django-16263` did it in half the tokens and half the time.
 
-| SWE-bench instance | Cold Claude Code | Claude Code with graft | Token usage vs. cold | Tool usage vs. cold |
-|---|---|---|---:|---:|
-| `django-11532` | Failed: 131 / 149 tests | **Passed: 149 / 149 tests** | **63%** | **60%** |
-| `django-16263` | Failed: 102 / 103 tests | **Passed: 103 / 103 tests** | **51%** | **74%** |
-| `sphinx-9461` | Failed: 61 / 62 tests | **Passed: 62 / 62 tests** | **91%** | **88%** |
-| `django-11400` | Failed: 62 / 64 tests | **Passed: 64 / 64 tests** | 347% | 308% |
-| `pylint-6386` | Failed: 7 / 8 tests | **Passed: 8 / 8 tests** | 163% | 132% |
-| `django-11885` | Failed: 42 / 44 tests | **Passed: 44 / 44 tests** | 219% | 172% |
+Two harnesses, two claims: the controlled sweep says the graft map is cheaper and faster, SWE-bench says it's also more correct.
 
-### Where graft cut the cost
-| SWE-bench instance | Cold Claude Code | Claude Code with graft | Token usage vs. cold | Tool usage vs. cold |
-|---|---|---|---:|---:|
-| `sphinx-10673` | Passed: 10 / 10 tests | **Passed: 10 / 10 tests** | **50%** | **51%** |
-| `django-16263` | Failed: 102 / 103 tests | **Passed: 103 / 103 tests** | **51%** | **74%** |
-| `django-11276` | Passed: 574 / 574 tests | **Passed: 574 / 574 tests** | **61%** | **58%** |
-| `django-10554` | Passed: 25 / 25 tests | **Passed: 25 / 25 tests** | **66%** | **69%** |
-| `django-11133` | Passed: 65 / 65 tests | **Passed: 65 / 65 tests** | **78%** | **61%** |
-| `sphinx-9461` | Failed: 61 / 62 tests | **Passed: 62 / 62 tests** | **91%** | **88%** |
-| `matplotlib-14623` | Passed: 401 / 401 tests | **Passed: 401 / 401 tests** | **95%** | **89%** |
-| `matplotlib-25775` | Passed: 96 / 96 tests | **Passed: 96 / 96 tests** | **98%** | **80%** |
+<sub>Correctness over all instances; tokens, cost and calls over the instances both arms resolved, for a like-for-like comparison. Official SWE-bench Verified images and official `swebench` 4.1.0 grader, native x86_64.</sub>
 
-graft resolved **15 of 20 instances** against Cold Claude Code's 13 — and got there with 26% fewer tool calls, 19% fewer tokens, and 32% less wall-clock time. Every correctness win has the same shape: the baseline patches one file and misses its siblings. On `django-11532` it patched 1 of the 5 files the fix requires and broke 18 previously-passing tests, twice over. On `django-16263` it patched 1 of 4 and scored 102 / 103. graft found the rest — and on `django-16263` did it in half the tokens and half the time.
+## Tested on popular repos
 
-Two harnesses, two claims: the controlled sweep says graft is cheaper and faster, SWE-bench says it's also more correct.
+The [benchmarks](/explanation/benchmarks/) measure the mechanism. The real test is whether the graft map helps an agent **ship real changes** on code people actually run, not just answer questions. So we benchmark it on popular open-source repos: **15 tasks each**, 10 real developer questions plus **5 actual implementation tasks** (real merged pull requests, each re-implemented from its base commit and scored against the files the maintainers actually changed). Same agent (Claude Opus), same file tools; the only difference is whether the graft map is wired in.
 
-<sub>Correctness and tests over all instances; tokens, cost and calls over the instances both arms resolved, for a like-for-like comparison. Official SWE-bench Verified images and official `swebench` 4.1.0 grader, native x86_64.</sub>
-## Tested on your popular repos
-
-The benchmarks measure the mechanism. The real test is whether graft helps an agent **ship real changes** on code people actually run, not just answer questions. So we benchmark it on popular open-source repos: **15 tasks each**, 10 real developer questions plus **5 actual implementation tasks** (real merged pull requests, each re-implemented from its base commit and scored against the files the maintainers actually changed). Same agent (Claude Opus), same file tools; the only difference is whether graft is wired in.
-
-Across these repos graft runs **up to 4× cheaper and 3× faster**, with better or no loss of correctness: it reproduces the real merged PRs by touching the same files the maintainers did. Per-repo detail below.
+On PocketBase the graft map ran **21% cheaper and 14% faster** across the 15 tasks, and **2.6× cheaper** on the hardest cross-file question, with no loss of correctness: it reproduced the real merged PRs by touching the same files the maintainers did.
 
 ### PocketBase (Go, ~350 files)
 
-| Aggregate over 15 tasks | Standard Claude Code | With graft |
+| Aggregate over 15 tasks | Standard Claude Code | With the graft map |
 |---|---|---|
 | Cost | $13.91 | **$11.02 (−21%)** |
 | Wall-clock | 2,044s | **1,762s (−14%)** |
 | PRs reproduced | 5 / 5 | **5 / 5 (same files as the maintainers)** |
 
-Cheaper and faster with no loss of correctness: graft reproduced all five merged PRs, touching the same files the maintainers did. The gap is widest on cross-file understanding — "how does auth work across OAuth2 providers" dropped from $2.19 to $0.84.
+Cheaper and faster with no loss of correctness: the graft map reproduced all five merged PRs, touching the same files the maintainers did. The gap is widest on cross-file understanding: "how does auth work across OAuth2 providers" dropped from $2.19 to $0.84.
 
 <details>
 <summary><b>The 10 questions we asked</b></summary>
 
-1. **Orientation** — Give me a map of PocketBase's architecture: the main subsystems and how an HTTP request flows through to the database.
-2. **Entry-point trace** — Trace end-to-end what happens when a client creates a record via the REST API, from route handler to database write.
-3. **Feature location** — I want to add a brand-new collection field type. Where do I hook it in, and which pieces must change?
-4. **Bug localization** — Realtime subscriptions silently stop delivering events after a while. Where would you start looking, and why?
-5. **Blast radius** — If I change the signature of the record-validation logic, what depends on it and what could break?
-6. **Cross-file synthesis** — How does auth work across OAuth2 providers: where are tokens issued, validated, stored, and refreshed?
-7. **Extensibility** — How do I use PocketBase as a Go framework to register a custom route plus an on-record-create hook?
-8. **Security discovery** — Where is user input validated, and where are collection API access rules enforced before a query runs?
-9. **Public API** — As an external app, how do I authenticate and then list and filter records over the REST API?
-10. **Test verification** — Where are the tests for the record CRUD API, and what do they assert about access rules?
+1. **Orientation**: Give me a map of PocketBase's architecture: the main subsystems and how an HTTP request flows through to the database.
+2. **Entry-point trace**: Trace end-to-end what happens when a client creates a record via the REST API, from route handler to database write.
+3. **Feature location**: I want to add a brand-new collection field type. Where do I hook it in, and which pieces must change?
+4. **Bug localization**: Realtime subscriptions silently stop delivering events after a while. Where would you start looking, and why?
+5. **Blast radius**: If I change the signature of the record-validation logic, what depends on it and what could break?
+6. **Cross-file synthesis**: How does auth work across OAuth2 providers: where are tokens issued, validated, stored, and refreshed?
+7. **Extensibility**: How do I use PocketBase as a Go framework to register a custom route plus an on-record-create hook?
+8. **Security discovery**: Where is user input validated, and where are collection API access rules enforced before a query runs?
+9. **Public API**: As an external app, how do I authenticate and then list and filter records over the REST API?
+10. **Test verification**: Where are the tests for the record CRUD API, and what do they assert about access rules?
 
 </details>
 
 <details>
 <summary><b>The 5 merged PRs we re-implemented</b></summary>
 
-Each PR was reset to its base commit; graft's diff was scored against the files the merged PR changed.
+Each PR was reset to its base commit; the agent's diff was scored against the files the merged PR changed.
 
 | PR | Type | What it does | Files the maintainers touched |
 |---|---|---|---|
@@ -115,6 +92,6 @@ Each PR was reset to its base commit; graft's diff was scored against the files 
 <details>
 <summary><b>Method</b></summary>
 
-Two clones of PocketBase at the same commit: one wired with `graft init`, one untouched and verified graft-free. Each task run headless (`claude -p`, Claude Opus) with an empty MCP config. Understanding questions were graded by whether the answer pointed to the right files and functions; PR tasks were scored on whether the agent's diff touched the same files as the merged PR. Every transcript was audited to confirm graft was actually used in the graft arm and absent from the standard arm.
+Two clones of PocketBase at the same commit: one wired with `graft init`, one untouched and verified to have no graft map in it. Each task run headless (`claude -p`, Claude Opus) with an empty MCP config. Understanding questions were graded by whether the answer pointed to the right files and functions; PR tasks were scored on whether the agent's diff touched the same files as the merged PR. Every transcript was audited to confirm the graft map was actually used in one arm and absent from the other.
 
 </details>

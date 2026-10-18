@@ -1,45 +1,80 @@
 ---
-title: Graft Docs
-description: Documentation for Graft — the open-source context layer for AI coding agents.
-template: splash
+title: "Trail-code"
+description: "Trail-code gives Claude Code, Cursor, Codex and other coding agents a map of your code, and what your team has learned about it."
+template: "splash"
 hero:
-  title: Graft
-  tagline: Persistent context for AI coding agents. 4× cheaper. 3× faster. Zero infrastructure.
+  title: "The self-learning context layer for coding agents."
+  tagline: "Trail-code gives Claude Code, Cursor, Codex and other coding agents a map of your code, and what your team has learned about it."
   image:
-    file: ../../assets/graft-hero.png
+    html: '<img class="light-only" src="/assets/trail-code-banner.png" alt="Trail-code (previously graft), by Trail. A map of a codebase, with one team decision pinned to it: keep retries at 4." width="2880" height="922" /><img class="dark-only" src="/assets/trail-code-banner-dark.png" alt="Trail-code (previously graft), by Trail. A map of a codebase, with one team decision pinned to it: keep retries at 4." width="2880" height="922" />'
   actions:
-    - text: Quick Start
+    - text: Quick start
       link: /tutorials/quick-start/
       icon: right-arrow
-      variant: primary
-    - text: View on GitHub
-      link: https://github.com/NanoNets/Graft
-      icon: external
-      variant: secondary
-      attrs:
-        target: _blank
-        rel: noopener noreferrer
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+<div align="center">
 
-## Explore the Docs
+| | Code map (previously graft) | Learnings |
+|---|---|---|
+| **What is it?** | An index of your code: every function and who calls it, so your agent sees what a change can break | What you, your agents and your team have learned and decided |
+| **What does it do for your agent?** | Takes it straight to the right files | Lets it pick up where you and your team left off |
+| **Where does it come from?** | Your code, read on your machine | Your conversations, as you work |
 
-<CardGrid>
-  <Card title="Tutorials" icon="open-book">
-    New to Graft? Follow step-by-step guides to get up and running in minutes.
-    [Quick start&nbsp;→](/tutorials/quick-start/)
-  </Card>
-  <Card title="How-To Guides" icon="setting">
-    Solve specific problems: configure providers, integrate with Claude Code, enable deep mode, and more.
-    [Browse guides&nbsp;→](/how-to/integrate-claude-code/)
-  </Card>
-  <Card title="Reference" icon="information">
-    Complete CLI commands, environment variables, graph structure, and node format specifications.
-    [View reference&nbsp;→](/reference/cli/)
-  </Card>
-  <Card title="Explanation" icon="puzzle">
-    Understand how Graft works, why it exists, and the design decisions behind it.
-    [Learn more&nbsp;→](/explanation/why-graft-exists/)
-  </Card>
-</CardGrid>
+<a href="https://trendshift.io/repositories/92209?utm_source=trendshift-badge&utm_medium=badge&utm_campaign=badge-trendshift-92209" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/92209/daily?language=TypeScript" alt="trailhq/Trail-Code | Trendshift" width="250" height="55"/></a>
+
+<p>
+  <a href="https://github.com/trailhq/Trail-Code"><img src="https://img.shields.io/github/stars/trailhq/Trail-Code?style=for-the-badge&logo=github&logoColor=white&label=Star%20on%20GitHub&color=FFC83D" /></a>
+  <a href="https://trailhq.com/graft"><img src="https://img.shields.io/badge/website-trailhq.com/graft-E5484D?style=for-the-badge" /></a>
+  <a href="https://discord.gg/zxmKweAA29"><img src="https://img.shields.io/badge/Discord-join-5865F2?style=for-the-badge&logo=discord&logoColor=white" /></a>
+  <a href="https://www.npmjs.com/package/@trailhq/trail-code"><img src="https://img.shields.io/npm/v/%40trailhq%2Ftrail-code?style=for-the-badge&logo=npm&logoColor=white&label=npm" /></a>
+  <a href="https://www.npmjs.com/package/@nanonets/graft"><img src="https://img.shields.io/npm/dm/%40nanonets%2Fgraft?style=for-the-badge&logo=npm&logoColor=white&label=downloads" /></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/node/v/%40trailhq%2Ftrail-code?style=for-the-badge&logo=nodedotjs&logoColor=white" /></a>
+  <img src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/License-MIT-20C997?style=for-the-badge" />
+  <a href="https://github.com/trailhq/Trail-Code/blob/main/TELEMETRY.md"><img src="https://img.shields.io/badge/telemetry-anonymous%2C%20opt--out-546FFF?style=for-the-badge" /></a>
+  <a href="https://scorecard.dev/viewer/?uri=github.com/trailhq/Trail-Code"><img src="https://img.shields.io/ossf-scorecard/github.com/trailhq/Trail-Code?style=for-the-badge&label=openssf%20scorecard" /></a>
+</p>
+
+## **46% fewer tool calls**, **60% less time**, and more real issues solved.
+
+| | Cold agent | Agent with the graft map |
+|---|---|---|
+| Tool calls, 162 runs | baseline | **46% fewer** |
+| Uncached input tokens, 162 runs | baseline | **42% fewer** |
+| Time, 162 runs | baseline | **60% less** |
+| SWE-bench Verified, 50 real issues | 27 solved (54%) | **33 solved (66%)** |
+
+```bash
+npm install -g @trailhq/trail-code && trail init
+```
+
+</div>
+
+:::note
+**Graft is now Trail-code.** Graft lives on as the graft map, and every `graft` command still works. What's new is learnings. [What changed](/how-to/coming-from-graft/)
+:::
+
+<div align="center">
+  <img class="light-only" src="/assets/trail-code-how-it-works.webp" alt="Without Trail: each task starts a new session with an agent that has no memory. It searches blind, opens the wrong files, guesses how the code is wired, ships the task, and the context is lost. This repeats for every task and every teammate's agent. With Trail, your agent already knows your code: trail init builds the graft map, a hook points the agent to it before each session, the agent reads the graph with its impact radius, gets precise context, ships the task, then saves learnings. One graph, every agent, up to 4x tokens saved." width="880"/>
+  <img class="dark-only" src="/assets/trail-code-how-it-works-dark.webp" alt="Without Trail: each task starts a new session with an agent that has no memory. It searches blind, opens the wrong files, guesses how the code is wired, ships the task, and the context is lost. This repeats for every task and every teammate's agent. With Trail, your agent already knows your code: trail init builds the graft map, a hook points the agent to it before each session, the agent reads the graph with its impact radius, gets precise context, ships the task, then saves learnings. One graph, every agent, up to 4x tokens saved." width="880"/>
+</div>
+
+## What changes in your agent
+
+| Without Trail-code | With Trail-code |
+|---|---|
+| Greps and opens file after file to find the code it needs | Gets the right files and functions with your prompt |
+| Re-explores code a teammate already figured out last week | Starts from their learning: what they decided, what they ruled out, what to watch out for |
+| Undoes a teammate's decision, because it never knew about it | `trail check` flags it before the PR, quoting who decided it and why |
+| Finds out at merge time that a teammate changed the same code | Says so right after it edits code a teammate's open branch also changes, and whether the two clash |
+| Has to be told the same things every session | Starts from what you've told it before: `trail init` finds what you said more than once in your past sessions |
+| You write and update CLAUDE.md by hand | Learnings are saved from your conversations, in files you can read |
+
+**Same model, more tasks solved.** On SWE-bench Verified (real GitHub issues, graded by the maintainers' own tests), Claude Sonnet 5 solved **33 of 50** issues with the graft map and **27 of 50** without it, using 23% fewer tokens. [Details](/explanation/benchmarks/#swe-bench-verified)
+
+**Cheaper and faster.** Across 162 runs of the same agent on the same tasks: **32% lower cost**, **42% fewer uncached input tokens**, **60% less time**, and the same share of correct answers. On PocketBase, 15 real tasks ran **21% cheaper** and **14% faster**. [Details](/explanation/benchmarks/)
+
+## License
+
+MIT. See [LICENSE](https://github.com/trailhq/Trail-Code/blob/main/LICENSE).

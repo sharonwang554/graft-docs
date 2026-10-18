@@ -1,0 +1,22 @@
+---
+title: "Coming from graft?"
+description: "Nothing breaks. The code map you know is now called the graft map, and it is one of Trail-code's two parts."
+sidebar:
+  order: 1
+---
+
+Nothing breaks. The code map you know is now called the graft map, and it is one of Trail-code's two parts.
+
+| | Before | Now |
+|---|---|---|
+| Name | graft | Trail-code |
+| The code map | graft | the graft map (same thing) |
+| Command | `graft` | `trail` (`graft` still works) |
+| Package | `@nanonets/graft` | `@trailhq/trail-code` (the old one still works) |
+| Learnings | None | New, see [Part 2](/explanation/learnings/) |
+
+`graft` and `@nanonets/graft` run the same code as `trail`, and print what they always printed.
+
+Already have graft? `graft upgrade` adds the `trail` command next to it.
+
+Repos that graft set up move to trail on their own: once the `trail` command is installed, each one moves the first time you open Claude Code in it. To move one right away, run `trail init` in it. Commit what changes so your teammates move too.

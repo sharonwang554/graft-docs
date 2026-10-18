@@ -1,0 +1,36 @@
+---
+title: "Search & orient (trail grep / trail map)"
+description: "trail map is a token-budgeted first look at a repo: directory clusters with file/symbol counts, each dir's local hubs, and the global hotspots, all ranked by in-degree, no LLM, no key."
+sidebar:
+  order: 4
+---
+
+`trail grep "<regex>"` is exhaustive over every indexed file and groups hits
+by enclosing symbol, ranked by the same in-edge coupling `trail map` uses.
+It's built for "every occurrence of this pattern" tasks where `trail ask`'s
+ranked top-N isn't enough:
+
+```
+"NEEDLE" — 2 hits in 2 symbols across 1 files (searched 1 indexed files)
+
+heavilyCalled · function · src/a.ts:L1-L3 · 3 in-edges
+  L2: console.log("NEEDLE hit in heavilyCalled");
+
+rarelyCalled · function · src/a.ts:L4-L6 · 0 in-edges
+  L5: console.log("NEEDLE hit in rarelyCalled");
+```
+
+`trail map` is a token-budgeted first look at a repo: directory clusters
+with file/symbol counts, each dir's local hubs, and the global hotspots,
+all ranked by in-degree, no LLM, no key:
+
+```
+repo map — 313 files · 2349 symbols · 8148 edges · javascript, typescript
+
+src/                157 files · 1804 symbols   hubs: wiringPath (write.ts, 48←), cmd (brand.ts, 45←), buildGraph (build.ts, 39←)
+test/               144 files · 467 symbols   hubs: tmpRepo (helpers.ts, 46←), fetch (app-identity.test.ts, 7←), fakeProviders (helpers.ts, 5←)
+viewer/             5 files · 71 symbols   hubs: $ (main.ts, 9←), cvar (data.ts, 6←), activeGraph (main.ts, 5←)
+scripts/            7 files · 7 symbols   hubs: bump (graph-quality.mjs, 1←), defaultTranscriptDir (tally-audit.mjs, 1←), flush (tally-audit.mjs, 1←)
+
+hotspots: wiringPath · function · src/graph/write.ts:L20-L22 · 48←  tmpRepo · function · test/helpers.ts:L30-L32 · 46←  cmd · function · src/brand.ts:L63-L70 · 45←  ...
+```

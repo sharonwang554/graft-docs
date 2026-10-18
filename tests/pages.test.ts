@@ -15,21 +15,20 @@ describe('Page existence', () => {
   });
 
   describe('Tutorials', () => {
-    it('should have getting-started', () => {
-      expect(docExists('tutorials/getting-started.mdx')).toBe(true);
-    });
-
-    it('should have your-first-graph', () => {
-      expect(docExists('tutorials/your-first-graph.mdx')).toBe(true);
+    it('should have quick-start', () => {
+      expect(docExists('tutorials/quick-start.mdx')).toBe(true);
     });
   });
 
   describe('How-To Guides', () => {
     const guides = [
-      'integrate-claude-code',
-      'set-up-mcp-server',
-      'work-with-monorepos',
+      'coming-from-graft',
+      'agent-integration',
+      'your-team',
+      'search-and-orient',
+      'monorepos',
       'visualize-codebase',
+      'development',
     ];
 
     for (const guide of guides) {
@@ -42,7 +41,11 @@ describe('Page existence', () => {
   describe('Reference', () => {
     const refs = [
       'cli',
-      'graph-structure',
+      'learning-file',
+      'whats-in-a-node',
+      'supported-languages',
+      'what-runs-where',
+      'what-stays-on-your-machine',
     ];
 
     for (const ref of refs) {
@@ -54,9 +57,12 @@ describe('Page existence', () => {
 
   describe('Explanation', () => {
     const explanations = [
-      'why-graft-exists',
-      'how-the-graph-works',
+      'how-it-works',
+      'graft-map',
+      'learnings',
+      'how-the-graph-gets-built',
       'benchmarks',
+      'faq',
     ];
 
     for (const exp of explanations) {

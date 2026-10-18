@@ -1,0 +1,13 @@
+---
+title: "How it works"
+description: "Trail-code has two parts. Both run on your machine."
+sidebar:
+  order: 1
+---
+
+Trail-code has two parts. Both run on your machine.
+
+1. **The graft map: your code.** `trail init` parses your repo with tree-sitter into a map of every file, function and who calls what. No model, no API key. It refreshes itself when the code changes, uncommitted edits included. Your agent gets pointers to the matching files and functions with each prompt, and sees what depends on a file right after it edits it.
+2. **Learnings: what you, your agents and your team know.** When a session works something out, or you correct how something is done, your agent saves it as a learning. The next session on that code, yours or a teammate's, starts from it instead of digging again. Learnings about the code are committed with the code; learnings about you stay on your machine. On day one, `trail init` starts you off with what you told Claude more than once in your past sessions, and what reviewers flagged on more than one of the repo's merged PRs.
+
+The graft map tells your agent *where* things are. Learnings tell it *why* they are that way, and *how* the work gets done here.

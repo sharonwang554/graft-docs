@@ -1,10 +1,10 @@
-# Graft Documentation Portal
+# Trail-code Documentation Portal
 
 [![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
 
-This repository contains a community documentation portal for **[Graft](https://github.com/NanoNets/Graft)** — the open-source context layer for AI coding agents.
+This repository contains an unofficial community documentation portal for **[Trail-code](https://github.com/trailhq/Trail-Code)** (previously Graft) — the self-learning context layer for coding agents.
 
-The site is built with [Astro Starlight](https://starlight.astro.build/) and structured using the [Diataxis](https://diataxis.fr/) framework, organizing content into Tutorials, How-To Guides, Reference, and Explanation.
+The site is built with [Astro Starlight](https://starlight.astro.build/) and structured using the [Diataxis](https://diataxis.fr/) framework, organizing content into Tutorials, How-To Guides, Reference, and Explanation. All page content is taken verbatim from the source repo's README; a site-wide banner records the source commit and sync time.
 
 ## 🚀 Quick Start
 
@@ -27,21 +27,22 @@ All documentation content lives in `src/content/docs/`. The structure follows Di
 src/content/docs/
 ├── index.mdx                       # Landing page
 ├── tutorials/                      # Learning-oriented: step-by-step guides
-│   ├── getting-started.mdx
-│   └── your-first-graph.mdx
+│   └── quick-start.mdx
 ├── how-to/                         # Task-oriented: solving specific problems
-│   ├── integrate-claude-code.mdx
-│   ├── set-up-mcp-server.mdx
+│   ├── agent-integration.mdx
+│   ├── coming-from-graft.mdx
 │   └── ...
 ├── reference/                      # Information-oriented: technical descriptions
 │   ├── cli.mdx
-│   ├── graph-structure.mdx
+│   ├── learning-file.mdx
 │   └── ...
 └── explanation/                    # Understanding-oriented: concepts and background
-    ├── why-graft-exists.mdx
-    ├── how-the-graph-works.mdx
+    ├── how-it-works.mdx
+    ├── learnings.mdx
     └── ...
 ```
+
+The source commit and sync time shown in the site banner live in `src/data/source.json`.
 
 ## 🛠️ Development & Testing
 

@@ -1,18 +1,22 @@
 ---
-title: Visualize it (graft viz)
-description: Explore the graph visually with graft viz.
+title: "Visualize it (trail viz)"
+description: "trail viz opens a local, interactive view of both graphs. No install, no dev server; the viewer ships prebuilt inside the package."
+sidebar:
+  order: 6
 ---
 
-`graft viz` opens a local, interactive view of both graphs — no install, no dev
+`trail viz` opens a local, interactive view of both graphs. No install, no dev
 server; the viewer ships prebuilt inside the package.
 
-![graft viz — searching a symbol and jumping to it lights up its dependency graph](/assets/graft-viz-demo.gif)
-*search → jump to a node → dependency graph lights up*
+<div align="center">
+  <img src="/assets/graft-viz-demo.gif" alt="The graph viewer: searching a symbol and jumping to it lights up its dependency graph: amber edges are what it depends on, indigo is what depends on it" width="820"/>
+  <br/><sub>search → jump to a node → dependency graph lights up</sub>
+</div>
 
-- **Context** tab — the architecture graph from `graft/*.md`. Nodes colored by
+- **Context** tab: the architecture graph from `graft/*.md`. Nodes colored by
   type, sized by connectedness.
-- **Code** tab — the per-symbol graph from `graft/.graph/wiring.json` (run `graft build` first).
-- **Outline** tab — the file → class → method hierarchy as a collapsible tree.
+- **Code** tab: the per-symbol graph from `graft/.graph/wiring.json` (run `trail build` first).
+- **Outline** tab: the file → class → method hierarchy as a collapsible tree.
 
 Edges speak the code's language. Every link is one of a closed set of verbs, each
 answering a question someone building or reviewing code actually asks:
@@ -25,10 +29,11 @@ answering a question someone building or reviewing code actually asks:
 | `configures` | what changes its behavior without a code change? |
 | `validates` | what checks or judges this? (tests, drift checks, scoring) |
 | `extends` / `implements` | what contract must this honor? |
+| `references` | what names this without calling it? (drawn as faint dots) |
 
 Select a node and its edges take on direction: **amber = what it depends on,
-teal = what depends on it**, with the verb written on each highlighted edge.
-Chips above the canvas filter by verb; tree-sitter-extracted edges draw solid
-while LLM-inferred ones draw dashed. The viewer live-reloads when `graft/`
+indigo = what depends on it**, with the verb written on each highlighted edge.
+Chips above the canvas filter by verb; edges the parser resolved exactly draw
+solid, while edges matched by name alone, or inferred by the model, draw dashed. The viewer live-reloads when `graft/`
 changes on disk. Older graphs with vague verbs (`influences`, `supports`) are
-normalized on load — no regeneration needed.
+normalized on load, so no regeneration is needed.

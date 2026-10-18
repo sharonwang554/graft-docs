@@ -1,0 +1,40 @@
+---
+title: "A learning is a file"
+description: "A decision is a short markdown file in .trail/learnings/, reviewed in the pull request like any other change."
+sidebar:
+  order: 2
+---
+
+A decision is a short markdown file in `.trail/learnings/`, reviewed in the pull request like any other change:
+
+```markdown
+---
+title: Keep the default retry count at 4
+author: Anirudh
+date: 2026-10-09
+cost: { tokens: 27400 }
+touches:
+  - client.go
+---
+
+## Decided
+- Keep defaultRetryMax = 4: ten retries with the default backoff can hold one Do() call for over an hour.
+
+## Tried and ruled out
+- Raising the default to 10 for one customer: worst case, a single Do() call blocks for over an hour.
+
+## Watch out
+- RetryWaitMax caps each wait at 30s, not the total: the waits add up with every retry.
+```
+
+`touches` is how the next session on `client.go` finds it. A learning also records what the session spent working it out, in minutes and tokens. That is where "saved ~27k tokens" comes from: what the learning took to work out, less what it costs to read.
+
+Where everything lives:
+
+```text
+your-repo/
+├── .trail/learnings/          learnings about this repo's code (commit them)
+└── graft/                     the graft map, a local cache (gitignored)
+
+~/.trail/                      your personal learnings, on this machine only
+```

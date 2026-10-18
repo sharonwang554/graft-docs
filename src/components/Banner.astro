@@ -1,0 +1,44 @@
+---
+import Default from '@astrojs/starlight/components/Banner.astro';
+import source from '../data/source.json';
+
+const shortCommit = source.commit.slice(0, 7);
+const generatedAt = new Date(source.generatedAt);
+const generatedLabel = new Intl.DateTimeFormat('en-US', {
+	dateStyle: 'medium',
+	timeStyle: 'short',
+	timeZone: 'UTC',
+}).format(generatedAt);
+---
+
+<div class="community-banner" role="note" data-pagefind-ignore>
+	<strong>Unofficial community docs.</strong> Generated from{' '}
+	<a href={`${source.url}/commit/${source.commit}`}><code>{source.repo}@{shortCommit}</code></a> on{' '}
+	<time datetime={source.generatedAt}>{generatedLabel} UTC</time>. For the latest, see the{' '}
+	<a href={source.url}>source repo</a>.
+</div>
+
+<Default {...Astro.props} />
+
+<style>
+	.community-banner {
+		padding: 0.5rem var(--sl-nav-pad-x);
+		background-color: var(--sl-color-bg-accent);
+		color: var(--sl-color-text-invert);
+		font-size: var(--sl-text-sm);
+		line-height: var(--sl-line-height-headings);
+		text-align: center;
+		text-wrap: balance;
+	}
+	.community-banner a {
+		color: inherit;
+		text-decoration: underline;
+	}
+	.community-banner code {
+		background: none;
+		border: 0;
+		padding: 0;
+		color: inherit;
+		font-size: inherit;
+	}
+</style>
