@@ -5,6 +5,13 @@ sidebar:
   order: 5
 ---
 
+| | Cold agent | Agent with the graft map |
+|---|---|---|
+| Tool calls, 162 runs | baseline | **46% fewer** |
+| Uncached input tokens, 162 runs | baseline | **42% fewer** |
+| Time, 162 runs | baseline | **60% less** |
+| SWE-bench Verified, 50 real issues | 27 solved (54%) | **33 solved (66%)** |
+
 An agent that reads the graft map should be cheaper and faster without getting more answers wrong. That's the whole claim, so we measured it instead of asserting it.
 
 The harness ran three variants of the same agent loop on Claude Sonnet 5, with the same file tools: **cold** (explores from zero), **push** (a `trail ask --source` bundle up front), and **pull** (the `trail_find_code` and `trail_file_api` tools, nothing injected, context paid for only when asked). An Opus 4.8 judge scored correctness with a required-keyword floor, so a fast but wrong answer couldn't win by being fast. Cost is cache-aware: reads ≈0.1×, writes 1.25×, the billing model agents actually run under.

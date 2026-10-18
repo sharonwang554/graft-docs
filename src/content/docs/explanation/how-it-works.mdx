@@ -11,3 +11,29 @@ Trail-code has two parts. Both run on your machine.
 2. **Learnings: what you, your agents and your team know.** When a session works something out, or you correct how something is done, your agent saves it as a learning. The next session on that code, yours or a teammate's, starts from it instead of digging again. Learnings about the code are committed with the code; learnings about you stay on your machine. On day one, `trail init` starts you off with what you told Claude more than once in your past sessions, and what reviewers flagged on more than one of the repo's merged PRs.
 
 The graft map tells your agent *where* things are. Learnings tell it *why* they are that way, and *how* the work gets done here.
+
+| | Code map (previously graft) | Learnings |
+|---|---|---|
+| **What is it?** | An index of your code: every function and who calls it, so your agent sees what a change can break | What you, your agents and your team have learned and decided |
+| **What does it do for your agent?** | Takes it straight to the right files | Lets it pick up where you and your team left off |
+| **Where does it come from?** | Your code, read on your machine | Your conversations, as you work |
+
+<div align="center">
+  <img class="light-only" src="/assets/trail-code-how-it-works.webp" alt="Without Trail: each task starts a new session with an agent that has no memory. It searches blind, opens the wrong files, guesses how the code is wired, ships the task, and the context is lost. This repeats for every task and every teammate's agent. With Trail, your agent already knows your code: trail init builds the graft map, a hook points the agent to it before each session, the agent reads the graph with its impact radius, gets precise context, ships the task, then saves learnings. One graph, every agent, up to 4x tokens saved." width="880"/>
+  <img class="dark-only" src="/assets/trail-code-how-it-works-dark.webp" alt="Without Trail: each task starts a new session with an agent that has no memory. It searches blind, opens the wrong files, guesses how the code is wired, ships the task, and the context is lost. This repeats for every task and every teammate's agent. With Trail, your agent already knows your code: trail init builds the graft map, a hook points the agent to it before each session, the agent reads the graph with its impact radius, gets precise context, ships the task, then saves learnings. One graph, every agent, up to 4x tokens saved." width="880"/>
+</div>
+
+## What changes in your agent
+
+| Without Trail-code | With Trail-code |
+|---|---|
+| Greps and opens file after file to find the code it needs | Gets the right files and functions with your prompt |
+| Re-explores code a teammate already figured out last week | Starts from their learning: what they decided, what they ruled out, what to watch out for |
+| Undoes a teammate's decision, because it never knew about it | `trail check` flags it before the PR, quoting who decided it and why |
+| Finds out at merge time that a teammate changed the same code | Says so right after it edits code a teammate's open branch also changes, and whether the two clash |
+| Has to be told the same things every session | Starts from what you've told it before: `trail init` finds what you said more than once in your past sessions |
+| You write and update CLAUDE.md by hand | Learnings are saved from your conversations, in files you can read |
+
+**Same model, more tasks solved.** On SWE-bench Verified (real GitHub issues, graded by the maintainers' own tests), Claude Sonnet 5 solved **33 of 50** issues with the graft map and **27 of 50** without it, using 23% fewer tokens. [Details](/explanation/benchmarks/#swe-bench-verified)
+
+**Cheaper and faster.** Across 162 runs of the same agent on the same tasks: **32% lower cost**, **42% fewer uncached input tokens**, **60% less time**, and the same share of correct answers. On PocketBase, 15 real tasks ran **21% cheaper** and **14% faster**. [Details](/explanation/benchmarks/)
