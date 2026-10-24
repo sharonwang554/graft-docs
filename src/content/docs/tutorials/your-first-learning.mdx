@@ -1,0 +1,101 @@
+---
+title: Your first learning
+description: Save a learning from a Claude Code session, commit it, and check a change against it with trail check.
+sidebar:
+  order: 3
+lastUpdated: 2026-10-24
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Your agent forgets everything when a session ends. A learning keeps what it worked out, so the next session on that code, yours or a teammate's, starts from it. This tutorial walks you through saving one and checking a change against it.
+
+You need a repo where you've already run `trail init` with Claude Code wired. See the [Quick start](/tutorials/quick-start/).
+
+<Steps>
+
+1. **Work something out with your agent**
+
+   In a Claude Code session, reach a decision, rule something out, or correct how something is done here.
+
+2. **Ask your agent to save it**
+
+   Say "save this as a learning". Your agent saves what was decided, what was ruled out, and what to watch out for: a summary, never a transcript, and nothing secret. It never saves one on its own, and doesn't offer to.
+
+   Something about the code goes in the repo; something about your own setup stays personal. The agent tells you which:
+
+   ```text
+   ✓ added to this repo · .trail/learnings/2026-10-09-keep-the-default-retry-count-at-maya.md
+   ```
+
+3. **Read the file**
+
+   A repo learning is a short markdown file in `.trail/learnings/`:
+
+   ```markdown
+   ---
+   title: Keep the default retry count at 4
+   author: Maya
+   date: 2026-10-09
+   cost: { tokens: 27400 }
+   touches:
+     - client.go
+   ---
+
+   ## Decided
+   - Keep defaultRetryMax = 4: ten retries with the default backoff can hold one Do() call for over an hour.
+
+   ## Tried and ruled out
+   - Raising the default to 10 for one customer: worst case, a single Do() call blocks for over an hour.
+
+   ## Watch out
+   - RetryWaitMax caps each wait at 30s, not the total: the waits add up with every retry.
+   ```
+
+   `touches` is how the next session on `client.go` finds it. See [Learning file format](/reference/learning-file-format/).
+
+4. **Commit it with the change**
+
+   The learning is reviewed in the pull request like any other change. Once `.trail/` is committed, every clone has it.
+
+5. **Check a change against it**
+
+   Before a PR, run:
+
+   ```bash
+   trail check
+   ```
+
+   `trail check` compares your branch's diff with the learnings in the repo, and your own. If a change goes against one, it says so, quoting who decided it and why:
+
+   ```text
+   checking 1 changed file against 1 learning and 0 skills
+
+   ✗ client.go:51
+     changes defaultRetryMax from 4 to 10
+     Maya · Oct 9: Keep defaultRetryMax = 4: ten retries with the
+     default backoff can hold one Do() call for over an hour.
+
+   · 1 conflict · fix it, or say why in the commit message or PR description
+   ```
+
+   `trail check` exits 1 on a conflict. Your agent is told to run it before it commits, pushes or opens a pull request.
+
+6. **See it on one screen**
+
+   ```bash
+   trail status
+   ```
+
+   The graft map, learnings and tokens saved, on one screen.
+
+</Steps>
+
+<Aside type="tip">
+You can also save a learning yourself, with the text on stdin: `trail note --title "<what it was about>"`. Add `--personal` to keep it in `~/.trail`. See [Save and check learnings](/how-to/save-and-check-learnings/).
+</Aside>
+
+## Next steps
+
+- [Learnings](/explanation/learnings/): the four kinds and three places, and how a decision travels between two teammates.
+- [Work with your team](/how-to/work-with-your-team/): see what the team learned this week.

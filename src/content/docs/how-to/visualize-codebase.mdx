@@ -1,34 +1,40 @@
 ---
-title: Visualize it (graft viz)
-description: Explore the graph visually with graft viz.
+title: Visualize your codebase
+description: Explore the graft map in the interactive viewer with trail viz, or export it as a single page.
+sidebar:
+  order: 10
+lastUpdated: 2026-10-24
 ---
 
-`graft viz` opens a local, interactive view of both graphs — no install, no dev
-server; the viewer ships prebuilt inside the package.
+`trail viz` opens a local, interactive view of both graphs. No install, no dev server; the viewer ships prebuilt inside the package.
 
-![graft viz — searching a symbol and jumping to it lights up its dependency graph](/assets/graft-viz-demo.gif)
+![The graph viewer: searching a symbol and jumping to it lights up its dependency graph: amber edges are what it depends on, indigo is what depends on it](/assets/graft-viz-demo.gif)
 *search → jump to a node → dependency graph lights up*
 
-- **Context** tab — the architecture graph from `graft/*.md`. Nodes colored by
-  type, sized by connectedness.
-- **Code** tab — the per-symbol graph from `graft/.graph/wiring.json` (run `graft build` first).
-- **Outline** tab — the file → class → method hierarchy as a collapsible tree.
+## Open the viewer
 
-Edges speak the code's language. Every link is one of a closed set of verbs, each
-answering a question someone building or reviewing code actually asks:
+```bash
+trail viz
+```
 
-| Verb | The question it answers |
-|---|---|
-| `part_of` / `contains` | where does this live? |
-| `uses` / `calls` / `imports` / `depends_on` | what breaks if I change this? |
-| `produces` | where does this output come from? |
-| `configures` | what changes its behavior without a code change? |
-| `validates` | what checks or judges this? (tests, drift checks, scoring) |
-| `extends` / `implements` | what contract must this honor? |
+The viewer has three tabs:
 
-Select a node and its edges take on direction: **amber = what it depends on,
-teal = what depends on it**, with the verb written on each highlighted edge.
-Chips above the canvas filter by verb; tree-sitter-extracted edges draw solid
-while LLM-inferred ones draw dashed. The viewer live-reloads when `graft/`
-changes on disk. Older graphs with vague verbs (`influences`, `supports`) are
-normalized on load — no regeneration needed.
+- **Context**: the architecture graph from `graft/*.md`. Nodes colored by type, sized by connectedness.
+- **Code**: the per-symbol graph from `graft/.graph/wiring.json` (run `trail build` first).
+- **Outline**: the file → class → method hierarchy as a collapsible tree.
+
+## Read the edges
+
+Select a node and its edges take on direction: **amber = what it depends on, indigo = what depends on it**, with the verb written on each highlighted edge. Chips above the canvas filter by verb. Edges the parser resolved exactly draw solid, while edges matched by name alone, or inferred by the model, draw dashed.
+
+Every edge is one of a closed set of verbs. See [Edge verbs](/reference/graph-structure/#edge-verbs).
+
+The viewer live-reloads when `graft/` changes on disk. Older graphs with vague verbs (`influences`, `supports`) are normalized on load, so no regeneration is needed.
+
+## Export a single page
+
+Write one self-contained `index.html` for CI, GitHub Pages, or a build artifact:
+
+```bash
+trail viz --export site/ --title "PR #12"
+```

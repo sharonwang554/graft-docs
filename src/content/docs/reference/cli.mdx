@@ -1,120 +1,275 @@
 ---
 title: CLI
-description: All graft commands and arguments.
+description: Every trail command and flag. Every graft command still works too.
+sidebar:
+  order: 1
+lastUpdated: 2026-10-24
 ---
 
-Graft's CLI provides tools for building, querying, visualizing, and managing your codebase graph. Method calls resolve through the receiver's type — constructor assignments (`self.router = APIRouter()`) and type annotations, not just the call-site name — so `callers`/`grep --in` return calls bound to the right type on method-heavy code, not every method anywhere with that name.
+import { Aside } from '@astrojs/starlight/components';
 
-## Build
+`trail --help` lists the commands in four groups: find code, learnings, setup, and CI. Every `graft` command still works too.
 
-### `graft build`
-Build `graft/` from the code at `[dir]`. Generates the wiring graph and per-file cards (no LLM, no key).
+Method calls resolve through the receiver's type, using constructor assignments (`self.router = APIRouter()`) and type annotations, not just the call-site name, so `callers`/`grep --in` return calls bound to the right type on method-heavy code, not every method anywhere with that name.
 
-| Option | Description |
-|---|---|
-| `--deep` | Add the LLM layer: concept nodes + per-symbol summary/crux (cached). |
-| `--extensions .ts .py` | Only include these code extensions. |
-| `--no-reuse` | Re-parse every file instead of replaying unchanged ones from cache. |
+## Find code
 
-## Query & Orient
+Your agent runs these. None of them needs an LLM or a key.
 
-Query commands (`ask`, `skeleton`, `callers`, `grep`, `map`) automatically refresh the graph first if the working tree has moved. See [Verify & Refresh](#verify--refresh) for configuration.
+### `trail ask`
 
-### `graft ask`
-Query the graph. Returns ranked nodes and exact file:line locations (no LLM, no key).
+```bash
+trail ask "<task>" [dir]
+```
+
+The matching code and learnings: ranked nodes + exact file:line.
 
 | Option | Description |
 |---|---|
-| `<task>` | The query to search the graph for. |
-| `--json` | Return machine-readable JSON result. |
-| `--in <scope>` | Narrow to one sub-project of a monorepo/multi-repo folder. |
+| `--json` | Machine-readable result |
+| `--in <scope>` | Narrow to one sub-project of a monorepo/multi-repo folder. See [Work with monorepos](/how-to/work-with-monorepos/). |
 
-### `graft skeleton`
-Print every signature in one file, no bodies. Provides the API surface for ~1/10th the tokens (no LLM, no key).
+### `trail grep`
 
-| Argument | Description |
-|---|---|
-| `<file>` | The target file to analyze. |
+```bash
+trail grep "<regex>" [dir]
+```
 
-### `graft callers`
-Find who calls, references, imports, implements, or extends a symbol (no LLM, no key).
+Exhaustive regex search over indexed files, grouped by enclosing symbol, ranked by how coupled that symbol is.
 
 | Option | Description |
 |---|---|
-| `<symbol>` | The symbol to find callers for. |
-| `--direction out` | The reverse: what the symbol itself calls/references (was `graft callees`). |
-| `-d N` | Walk transitively out to depth N — full blast radius (was `graft impact`). |
+| `--in <path>` | Narrow to files at or under this path prefix |
+| `-i` | Case-insensitive |
+| `--fixed` | Treat the pattern as a literal string, not a regex |
 
-### `graft grep`
-Exhaustive regex search over indexed files, grouped by enclosing symbol (no LLM, no key).
+### `trail skeleton`
 
-| Option | Description |
-|---|---|
-| `"<regex>"` | The search pattern. |
-| `--in <path>` | Narrow to files at or under this path prefix. |
-| `-i --fixed` | Case-insensitive; treat the pattern as a literal string, not a regex. |
+```bash
+trail skeleton <file> [dir]
+```
 
-### `graft map`
-Token-budgeted repo orientation — dir clusters, hubs, hotspots (no LLM, no key).
+Every signature in one file, no bodies: the API surface for ~1/10th the tokens.
 
-| Option | Description |
-|---|---|
-| `--max-dirs N` | Raise/lower the maximum number of directories shown. |
+### `trail callers`
 
-## Verify & Refresh
+```bash
+trail callers <symbol> [dir]
+```
 
-### `graft check`
-Fail (exit 1) if `graft/` has drifted from the code. Never auto-refreshes — it's the drift report.
+Who calls/references/imports/implements/extends a symbol.
 
 | Option | Description |
 |---|---|
-| `--json` | Print the drift report as JSON. |
+| `--direction out` | The reverse: what the symbol itself calls/references |
+| `-d N` | Walk transitively out to depth N: full blast radius |
 
-### Refresh Configuration
-`ask`, `skeleton`, `callers`, `grep`, and `map` all refresh the graph first if the working tree moved. You can configure this behavior:
+### `trail map`
+
+```bash
+trail map [dir]
+```
+
+Token-budgeted repo orientation: dir clusters, hubs, hotspots.
+
+| Option | Description |
+|---|---|
+| `--max-dirs N` | Raise/lower the number of directories shown |
+
+### Refresh
+
+`ask`, `skeleton`, `callers`, `grep`, `map` and `blast` all refresh the graph first if the working tree moved.
 
 | Setting | Description |
 |---|---|
-| `--no-refresh` | (Flag) Answer from the graph exactly as it is on disk. |
-| `GRAFT_NO_REFRESH=1` | (Environment Variable) Same, for every command. |
-| `GRAFT_REFRESH=hash` | (Environment Variable) Hash every file instead of trusting size+mtime. |
+| `--no-refresh` | Answer from the graph exactly as it is on disk |
+| `GRAFT_NO_REFRESH=1` | Same, for every command |
+| `GRAFT_REFRESH=hash` | Hash every file instead of trusting size+mtime |
 
-## Visualize
+## Learnings
 
-### `graft viz`
-See the graph: serves an interactive viewer on localhost.
+### `trail note`
 
-| Option | Description |
-|---|---|
-| `--port 5000` | Pick a specific port. |
-| `--no-open` | Don't auto-open the browser. |
+```bash
+trail note --title "<about>" [dir]
+```
 
-## Setup & Maintenance
-
-### `graft init`
-Pick which agents to wire. Prompts on a terminal; writes nothing until you choose.
+Save a decision: what this session decided, tried and ruled out. The text is read from stdin.
 
 | Option | Description |
 |---|---|
-| `--dry-run` | List every file it would touch, then exit. |
-| `--agents <ids...>` | Wire only these agents, no prompt. IDs: `agents`, `cursor`, `gemini`, `copilot`, `kiro`, `windsurf`, `adal`, `claude`. |
-| `--yes` | No prompt; wire every detected agent. |
-| `--no-global` | Skip writes outside this repo (`~/.codex/` config + hooks). |
-| `--no-build` | Wire the files only; don't build the graph. |
-| `--all-agents` | Wire every known agent, detected or not. |
-| `--list-agents` | List known agent ids and exit. |
+| `--personal` | About your own setup, not the code: keep it in `~/.trail`, out of the repo |
 
-### `graft version`
-Print the installed + latest published npm version.
+### `trail check`
 
-### `graft upgrade`
-`npm install -g` the latest published version.
+```bash
+trail check [dir]
+```
 
-## Global Options
-
-These options can be appended to any command.
+Check your branch's diff against the repo's learnings, yours and your skills. Exits 1 on a conflict.
 
 | Option | Description |
 |---|---|
-| `--dir <path>` | Use a context dir other than `<repo>/graft`. |
-| `--version, -v` | Print the installed version and exit. |
+| `--base <ref>` | Compare against this base (for example, `origin/main`) instead of origin's default branch |
+
+### `trail team`
+
+```bash
+trail team [dir]
+```
+
+What the team learned this week, who's working on what, and where work overlaps.
+
+### `trail skills`
+
+| Command | Description |
+|---|---|
+| `trail skills [--json]` | Your skills: scope, status, uses; held ones; jobs Trail is counting; offers |
+| `trail skills off \| on [<name>]` | Skills are on by default: turn them off, or back on (only you, in your own terminal); or one skill |
+| `trail skills offers on \| off [--here]` | Skill offers everywhere, or just this repo (only you turn them on) |
+| `trail skills show <name>` | Print a skill and its status |
+| `trail skills keep <name>` | Keep a skill Trail held because nobody said yes (only you) |
+| `trail skills restore <name>` | Bring back a skill you forgot |
+
+### `trail forget`
+
+```bash
+trail forget <name>
+```
+
+Forget a skill; `trail skills restore <name>` brings it back.
+
+## Setup
+
+### `trail init`
+
+```bash
+trail init [dir]
+```
+
+Pick which agents to wire. Prompts on a terminal; writes nothing until you choose. See [Agent wiring](/reference/agent-wiring/).
+
+| Option | Description |
+|---|---|
+| `--dry-run` | List the agent wiring it would write, then exit |
+| `--agents <ids...>` | Wire only these agents, no prompt. Ids: `agents`, `adal`, `cursor`, `gemini`, `grok`, `hermes`, `antigravity`, `copilot`, `kiro`, `windsurf`, `claude` |
+| `--yes`, `-y` | No prompt; wire every detected agent |
+| `--all-agents` | Wire every known agent, detected or not |
+| `--no-agents` | Claude Code wiring only; skip other agents |
+| `--list-agents` | List known agent ids and exit |
+| `--no-mcp` | Skip MCP registration for agents other than Claude Code |
+| `--no-hooks` | Skip hook installation for agents other than Claude Code |
+| `--no-statusline` | Skip Claude Code `statusLine` (same as `GRAFT_NO_STATUSLINE=1`) |
+| `--no-global` | Skip writes outside this repo (`~/.claude`, `~/.claude.json`, `~/.codex`, `~/.gemini`) |
+| `--no-build` | Wire the files only; don't build the graph |
+
+### `trail build`
+
+```bash
+trail build [dir]
+```
+
+Build the graft map in `graft/`: wiring graph + per-file cards (no LLM, no key).
+
+| Option | Description |
+|---|---|
+| `--deep` | Add the LLM layer: concept nodes + per-symbol summary/crux (cached) |
+| `--deep -e .ts .py` | With `--deep`: only summarize these extensions |
+| `--check` | Build nothing: fail (exit 1) if `graft/` has drifted from the code, for CI |
+| `--no-reuse` | Re-parse every file instead of replaying unchanged ones from cache |
+| `--lsp` | Add precise `lsp_resolved` call edges when a language server is on your `PATH`. See [Supported languages](/reference/supported-languages/). |
+| `--follow-submodules` | Include initialized submodules; persist the choice for builds + MCP refresh |
+| `--no-follow-submodules` | Exclude submodules again and persist that choice (the default) |
+| `--follow-nested-repos` | Include nested git clones the index doesn't track; persist the choice |
+| `--no-follow-nested-repos` | Exclude nested clones again and persist that choice (the default) |
+| `--provider`, `--model`, `--api-key`, `--base-url` | Provider settings for `--deep`. See [Configure providers](/how-to/configure-providers/). |
+
+### `trail status`
+
+```bash
+trail status [dir]
+```
+
+The graft map, learnings and tokens saved, on one screen.
+
+### `trail upgrade`
+
+```bash
+trail upgrade
+```
+
+`npm install -g` the latest published version. A new version is announced automatically (checked once a day); after upgrading, the next session refreshes this repo's wiring itself.
+
+### `trail uninstall`
+
+```bash
+trail uninstall [dir]
+```
+
+Remove every file and config entry it wrote here (the inverse of `init`).
+
+| Option | Description |
+|---|---|
+| `-y` | Actually remove (without `-y` it prints what it would remove and exits) |
+| `--keep-cache` | Wiring only; leave `graft/` and the `.gitignore` entry |
+| `--no-global` | Leave out-of-repo files alone (`~/.claude`, `~/.claude.json`, `~/.codex`, `~/.gemini`) |
+
+### `trail telemetry`
+
+```bash
+trail telemetry [status|enable|disable|debug]
+```
+
+Anonymous usage stats; `debug` prints exactly what would be sent. See [Manage telemetry](/how-to/manage-telemetry/).
+
+## CI
+
+### `trail blast`
+
+```bash
+trail blast [dir]
+```
+
+Blast radius of a diff: what depends on the lines this change touched (no LLM, no key).
+
+| Option | Description |
+|---|---|
+| `--base origin/main` | Diff against the merge base with HEAD (what a PR job runs) |
+| `--format markdown` | A PR comment: the areas a change can reach, per-symbol detail collapsed under it |
+| `--name` | Name those areas with one cached LLM call, instead of a full `--deep` build |
+| `--export-viz site/` | Also write the interactive page for this radius (what a PR comment links to) |
+| `--no-owners` | Skip "who to tag" (by default, git history names the people behind each area) |
+| `--depth all --format json` | The full transitive closure, machine-readable |
+
+## Not listed in `--help`
+
+### `trail viz`
+
+```bash
+trail viz [dir]
+```
+
+See the graph: serves an interactive viewer on localhost. See [Visualize your codebase](/how-to/visualize-codebase/).
+
+| Option | Description |
+|---|---|
+| `--export site/ --title "PR #12"` | One self-contained `index.html` for CI, GitHub Pages, or a build artifact |
+
+### `trail mcp`
+
+```bash
+trail mcp [dir]
+```
+
+Run the MCP server by hand. See [MCP tools](/reference/mcp-tools/).
+
+## Global options
+
+| Option | Description |
+|---|---|
+| `--dir <path>` | Use a context dir other than `<repo>/graft` |
+| `--version`, `-v` | Print the installed version and exit |
+
+<Aside type="tip">
+With no `[dir]` argument, commands walk up to the nearest `graft/`, so they work from a subdirectory without a `cd` to the repo root.
+</Aside>

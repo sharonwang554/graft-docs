@@ -1,19 +1,19 @@
 ---
-title: Graft — Context for AI Coding Agents
-description: Documentation for Graft — the open-source context layer for AI coding agents.
+title: Trail-code — the self-learning context layer for coding agents
+description: Documentation for Trail-code (previously graft), the self-learning context layer for coding agents.
 template: splash
 hero:
-  title: Graft
-  tagline: Persistent context for AI coding agents. 4× cheaper. 3× faster. Zero infrastructure.
+  title: Trail-code
+  tagline: Trail-code gives Claude Code, Cursor, Codex and other coding agents a map of your code, and what your team has learned about it.
   image:
-    file: ../../assets/graft-hero.png
+    html: '<img src="/assets/trail-code-banner-dark.png" width="2880" height="922" alt="Trail-code (previously graft), by Trail. A map of a codebase, with one team decision pinned to it: keep retries at 4." />'
   actions:
     - text: Quick Start
       link: /tutorials/quick-start/
       icon: right-arrow
       variant: primary
     - text: View on GitHub
-      link: https://github.com/NanoNets/Graft
+      link: https://github.com/trailhq/Trail-Code
       icon: external
       variant: secondary
       attrs:
@@ -21,25 +21,33 @@ hero:
         rel: noopener noreferrer
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
 
-## Explore the Docs
+<Aside type="note" title="Graft is now Trail-code">
+Graft lives on as the graft map, and every `graft` command still works. What's new is learnings. [What changed](/how-to/migrate-from-graft/)
+</Aside>
+
+```bash
+npm install -g @trailhq/trail-code && trail init
+```
+
+## Explore the docs
 
 <CardGrid>
   <Card title="Tutorials" icon="open-book">
-    New to Graft? Follow step-by-step guides to get up and running in minutes.
+    New to Trail-code? Install it, explore your first graph, and save your first learning.
     [Quick start&nbsp;→](/tutorials/quick-start/)
   </Card>
   <Card title="How-To Guides" icon="setting">
-    Solve specific problems: configure providers, integrate with Claude Code, enable deep mode, and more.
-    [Browse guides&nbsp;→](/how-to/integrate-claude-code/)
+    Solve specific problems: move from graft, wire in your agents, save and check learnings, run in CI, and more.
+    [Browse guides&nbsp;→](/how-to/migrate-from-graft/)
   </Card>
   <Card title="Reference" icon="information">
-    Complete CLI commands, environment variables, graph structure, and node format specifications.
+    CLI commands, MCP tools, agent wiring, environment variables, the learning file format, and supported languages.
     [View reference&nbsp;→](/reference/cli/)
   </Card>
   <Card title="Explanation" icon="puzzle">
-    Understand how Graft works, why it exists, and the design decisions behind it.
-    [Learn more&nbsp;→](/explanation/why-graft-exists/)
+    Understand how Trail-code works, what learnings are, what stays on your machine, and how it is benchmarked.
+    [Learn more&nbsp;→](/explanation/why-trail-code-exists/)
   </Card>
 </CardGrid>

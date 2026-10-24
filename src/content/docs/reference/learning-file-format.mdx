@@ -1,0 +1,75 @@
+---
+title: Learning file format
+description: Where learnings live, their kinds and places, and the fields and sections in a learning file.
+sidebar:
+  order: 6
+lastUpdated: 2026-10-24
+---
+
+## Where learnings live
+
+```text
+your-repo/
+├── .trail/learnings/          learnings about this repo's code (commit them)
+└── graft/                     the graft map, a local cache (gitignored)
+
+~/.trail/                      your personal learnings, on this machine only
+```
+
+## Places
+
+| Place | What goes there | Where it lives | Who sees it |
+|---|---|---|---|
+| **Personal** | About you and your machine: your setup, your habits | `~/.trail/` | Only you. Never committed, never uploaded |
+| **Repo** | About the code: why it is the way it is, how work gets done in it | the repo's `.trail/`, committed with the change | Everyone who clones the repo, even before they install Trail-code |
+| **Team** | What your whole team has learned, across repos | a Trail workspace (soon) | Your team, on the team page |
+
+## Kinds
+
+| Kind | Example | Personal | Repo | Team |
+|---|---|:---:|:---:|:---:|
+| **Decisions**: why the code is the way it is | *"Keep retries at 4. Ruled out 10: one call could block for over an hour."* | ✅ | ✅ | soon |
+| **Preferences**: how you like things done | *"Use pnpm, not npm."* | ✅ | ✅ | soon |
+| **Skills**: how a job is done here | *"Read rotation with page.Rotation(), never pdfcpu: it drops /Rotate."* | soon | soon | soon |
+| **Guardrails**: what must never happen | *"Never push to main."* | soon | soon | soon |
+
+## A decision file
+
+A decision is a short markdown file in `.trail/learnings/`, reviewed in the pull request like any other change. Files are named like `2026-10-09-keep-the-default-retry-count-at-maya.md`.
+
+```markdown
+---
+title: Keep the default retry count at 4
+author: Maya
+date: 2026-10-09
+cost: { tokens: 27400 }
+touches:
+  - client.go
+---
+
+## Decided
+- Keep defaultRetryMax = 4: ten retries with the default backoff can hold one Do() call for over an hour.
+
+## Tried and ruled out
+- Raising the default to 10 for one customer: worst case, a single Do() call blocks for over an hour.
+
+## Watch out
+- RetryWaitMax caps each wait at 30s, not the total: the waits add up with every retry.
+```
+
+### Frontmatter
+
+| Field | Meaning |
+|---|---|
+| `cost` | What the session spent working the learning out, in minutes and tokens |
+| `touches` | How the next session on those files finds it |
+
+### Sections
+
+| Section | What it holds |
+|---|---|
+| `## Decided` | What was decided |
+| `## Tried and ruled out` | What was ruled out |
+| `## Watch out` | What to watch out for |
+
+"Saved ~27k tokens" comes from `cost`: what the learning took to work out, less what it costs to read.

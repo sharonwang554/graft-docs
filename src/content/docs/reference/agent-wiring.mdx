@@ -1,0 +1,61 @@
+---
+title: Agent wiring
+description: The agent ids, init flags, and files trail init writes for each coding agent, inside and outside the repo.
+sidebar:
+  order: 5
+lastUpdated: 2026-10-24
+---
+
+What `trail init` writes for each agent. For the steps, see [Wire in other agents](/how-to/agent-integration/) and [Integrate with Claude Code](/how-to/integrate-claude-code/).
+
+## Agent ids
+
+`agents`, `adal`, `cursor`, `gemini`, `grok`, `hermes`, `antigravity`, `copilot`, `kiro`, `windsurf`, `claude`
+
+`trail init --list-agents` prints them.
+
+## Files in the repo
+
+Selected agents get one of:
+
+- **A marker-fenced Trail-code section in their shared instruction file**: `AGENTS.md` for Codex, OpenCode and other CLIs that read it, `GEMINI.md`, `.github/copilot-instructions.md`.
+- **A wholly-owned rule or skill file**, for the agents that use one, such as `.claude/skills/trail/SKILL.md` and `.cursor/rules/trail.mdc`.
+
+Claude Code is in the second group: `init` writes its own skill file and never touches your `CLAUDE.md`. Re-running only updates Trail-code's own section (or replaces the owned file) and never touches the rest of your content.
+
+`trail init` also writes the MCP server into the project's `.mcp.json`, and creates `.trail/` for the repo's learnings.
+
+## Writes outside the repo
+
+Some agents also get **user-level** files, so the wiring follows you into worktrees and folders the repo's files don't reach:
+
+| Agent | Path | What changes |
+|---|---|---|
+| Claude Code | `~/.claude/settings.json` | `SessionStart`, `UserPromptSubmit`, `PreToolUse` (on `Bash`), `PostToolUse` and `Stop` hooks |
+| Claude Code | `~/.claude/helpers/graft-hooks.cjs` | the hooks shim they call |
+| Claude Code | `~/.claude.json` | the `trail` MCP server |
+| Codex (`agents`), when `~/.codex/` exists | `~/.codex/config.toml` | the `trail` MCP server |
+| Codex | `~/.codex/hooks.json` | the same five hook events, matching `apply_patch\|Write\|Edit\|MultiEdit` after edits |
+| Codex | `~/.codex/hooks/graft/graft-hooks.cjs` | the hooks shim |
+| Antigravity | `~/.gemini/config/mcp_config.json` | the `trail` MCP server |
+| Antigravity | `~/.gemini/skills/trail/SKILL.md` | its skill file |
+
+These apply to **every** repo you open with that agent, not just this one. The picker labels them `machine-wide`, `--dry-run` lists them in their own section, and `--no-global` skips them all while still wiring the repo's own files.
+
+## `trail init` flags
+
+| Flag | Effect |
+|---|---|
+| `--agents <ids...>` | wire only these, no prompt |
+| `--yes`, `-y` | skip the prompt and wire every **detected** agent |
+| `--dry-run` | print the agent wiring `init` would write, then exit without writing |
+| `--all-agents` | write instruction files for every known agent, detected or not |
+| `--no-agents` | Claude Code wiring only; skip other agents |
+| `--list-agents` | print the known agent ids and exit |
+| `--no-mcp` | skip MCP registration for agents other than Claude Code |
+| `--no-hooks` | skip hook installation for agents other than Claude Code |
+| `--no-statusline` | skip writing Claude Code `statusLine` (same as `GRAFT_NO_STATUSLINE=1`) |
+| `--no-global` | skip writes outside this repo |
+| `--no-build` | wire the files only; don't build the graph |
+
+With no TTY to prompt on (CI, a Dockerfile, a piped shell), `init` writes **nothing** and prints the command to run instead.

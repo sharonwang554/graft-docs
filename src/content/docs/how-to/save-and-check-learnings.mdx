@@ -1,0 +1,55 @@
+---
+title: Save and check learnings
+description: Save a learning, keep one personal, check your branch against learnings before a PR, and fix a wrong learning.
+sidebar:
+  order: 5
+lastUpdated: 2026-10-24
+---
+
+Your agent uses learnings on its own. These are the moments you act on them, and the commands if you want them.
+
+## Save a learning through your agent
+
+Say "save this as a learning" after a decision, something you ruled out, or a correction to how something is done here. Your agent saves what was decided, what was ruled out, and what to watch out for. It never saves one on its own, and doesn't offer to.
+
+Your agent picks between personal and repo: something about your own setup stays personal ("saved just for you"); something about the code goes in the repo ("added to this repo").
+
+## Save a learning from the command line
+
+Pass the text on stdin:
+
+```bash
+trail note --title "<what it was about>"
+```
+
+To keep it about your own setup, not the code, in `~/.trail` and out of the repo:
+
+```bash
+trail note --personal
+```
+
+## Check your branch before a PR
+
+```bash
+trail check
+```
+
+`trail check` checks your branch's diff against the repo's learnings, yours and your skills, and exits 1 on a conflict. On a conflict, fix it, or say why in the commit message or PR description.
+
+To compare against a base other than origin's default branch:
+
+```bash
+trail check --base origin/main
+```
+
+Your agent is told to run `trail check` before it commits, pushes or opens a pull request. Your agent never edits an existing learning. When it goes against one, it says why in the commit, and saves a new one only when you say so.
+
+## Fix a wrong learning
+
+A repo learning is a file in your pull request, so it gets reviewed like the code it is about. Delete or edit the file to drop it. Personal learnings are files in `~/.trail`, just as easy to change.
+
+## See also
+
+- [Learning file format](/reference/learning-file-format/)
+- [Learnings](/explanation/learnings/)
+- [CLI reference](/reference/cli/#learnings): `trail skills` and `trail forget`

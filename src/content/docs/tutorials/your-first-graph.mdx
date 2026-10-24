@@ -1,113 +1,106 @@
 ---
 title: Your first graph
-description: How to explore your codebase graph with graft map, grep, callers, and check.
+description: Explore the graft map with trail map, grep, skeleton, callers, status, and viz.
+sidebar:
+  order: 2
+lastUpdated: 2026-10-24
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
-Once you've run `graft init`, you have a `graft/` directory full of linked Markdown nodes describing your codebase. This tutorial shows you how to explore and orient yourself.
-
-## Search & orient
+Once you've run `trail init`, you have a graft map of your repo in `graft/`. This tutorial shows you how to explore and orient yourself. `ask`, `grep`, `skeleton`, `callers` and `map` need no LLM and no key.
 
 <Steps>
 
-1. **View the codebase map**
+1. **View the repo map**
 
    ```bash
-   graft map
+   trail map
    ```
 
-   `graft map` is a token-budgeted first look at a repo — directory clusters with file/symbol counts, each dir's local hubs, and the global hotspots — all ranked by in-degree, no LLM, no key:
+   `trail map` is a token-budgeted first look at a repo: directory clusters with file/symbol counts, each dir's local hubs, and the global hotspots, all ranked by in-degree:
 
    ```text title="Terminal Output"
-   repo map — 113 files · 687 symbols · 2186 edges · typescript
-   
-   src/                63 files · 527 symbols   hubs: contextDirFor (node-file.ts, 21←), wiringPath (write.ts, 14←), buildGraph (build.ts, 11←)
-   test/               43 files · 102 symbols   hubs: edge (graph-traverse.test.ts, 4←), graphOf (graph-traverse.test.ts, 4←), fileNode (graph-map.test.ts, 3←)
-   viewer/             5 files · 58 symbols   hubs: $ (main.ts, 9←), activeGraph (main.ts, 5←), cvar (data.ts, 5←)
-   scripts/            2 files · 0 symbols
-   
-   hotspots: contextDirFor · function · src/context/node-file.ts:L100-L103 · 21←  wiringPath · function · src/graph/write.ts:L20-L22 · 14←  buildGraph · function · src/graph/build.ts:L104-L218 · 11←  ...
+   repo map — 313 files · 2349 symbols · 8148 edges · javascript, typescript
+
+   src/                157 files · 1804 symbols   hubs: wiringPath (write.ts, 48←), cmd (brand.ts, 45←), buildGraph (build.ts, 39←)
+   test/               144 files · 467 symbols   hubs: tmpRepo (helpers.ts, 46←), fetch (app-identity.test.ts, 7←), fakeProviders (helpers.ts, 5←)
+   viewer/             5 files · 71 symbols   hubs: $ (main.ts, 9←), cvar (data.ts, 6←), activeGraph (main.ts, 5←)
+   scripts/            7 files · 7 symbols   hubs: bump (graph-quality.mjs, 1←), defaultTranscriptDir (tally-audit.mjs, 1←), flush (tally-audit.mjs, 1←)
+
+   hotspots: wiringPath · function · src/graph/write.ts:L20-L22 · 48←  tmpRepo · function · test/helpers.ts:L30-L32 · 46←  cmd · function · src/brand.ts:L63-L70 · 45←  ...
    ```
 
-2. **Search the graph**
+2. **Ask for the code that matches a task**
 
    ```bash
-   graft grep "NEEDLE"
+   trail ask "<task>"
    ```
 
-   `graft grep` is exhaustive over every indexed file and groups hits by enclosing symbol, ranked by the same in-edge coupling `graft map` uses — built for "every occurrence of this pattern" tasks where `graft ask`'s ranked top-N isn't enough:
+   Returns the matching code and learnings: ranked nodes and exact file:line.
+
+3. **Search every occurrence of a pattern**
+
+   ```bash
+   trail grep "NEEDLE"
+   ```
+
+   `trail grep` is exhaustive over every indexed file and groups hits by enclosing symbol, ranked by the same in-edge coupling `trail map` uses. It's built for "every occurrence of this pattern" tasks where `trail ask`'s ranked top-N isn't enough:
 
    ```text title="Terminal Output"
    "NEEDLE" — 2 hits in 2 symbols across 1 files (searched 1 indexed files)
-   
+
    heavilyCalled · function · src/a.ts:L1-L3 · 3 in-edges
      L2: console.log("NEEDLE hit in heavilyCalled");
-   
+
    rarelyCalled · function · src/a.ts:L4-L6 · 0 in-edges
      L5: console.log("NEEDLE hit in rarelyCalled");
    ```
 
-3. **Trace call sites**
+4. **See a file's API surface**
 
    ```bash
-   graft callers MyFunction
+   trail skeleton <file>
    ```
 
-   Find out who calls, references, imports, implements, or extends a symbol.
+   Every signature in one file, no bodies: the API surface for about a tenth of the tokens.
 
-4. **Check graph health**
+5. **Trace who calls a symbol**
 
    ```bash
-   graft check
+   trail callers <symbol>
+   trail callers <symbol> -d N
    ```
 
-   Verifies if the `graft/` directory has drifted from the code (never auto-refreshes — it's the drift report).
+   Find who calls, references, imports, implements or extends a symbol. Add `-d N` to walk transitively out to depth N: the full blast radius.
 
-5. **Visualize the graph**
+6. **Check the status**
 
    ```bash
-   graft viz
+   trail status
    ```
 
-   Serves an interactive viewer on localhost so you can visually explore the nodes and dependencies.
+   The graft map, learnings and tokens saved, on one screen.
+
+7. **Visualize the graph**
+
+   ```bash
+   trail viz
+   ```
+
+   Serves an interactive viewer on localhost. See [Visualize your codebase](/how-to/visualize-codebase/).
 
 </Steps>
 
-## Understand the `graft/` directory
-
-The generated graph lives in `graft/` and consists of:
-
-- **Markdown node files** (`graft/*.md`) — One per subsystem or concept, with typed wikilinks between them.
-- **Wiring graph** (`graft/.graph/wiring.json`) — Per-symbol code graph built by tree-sitter.
-- **Per-file wiring cards** — Mirror your source tree with structural information.
-
-<Aside type="tip">
-The `graft/` directory is a local, regenerable cache (like `node_modules`). Don't commit it — it's already in `.gitignore`.
+<Aside type="note">
+`ask`, `skeleton`, `callers`, `grep`, `map` and `blast` all refresh the graph first if the working tree moved, so answers describe the code as it is right now, uncommitted edits included.
 </Aside>
 
-## Monorepos & multi-repo folders
+## What's in `graft/`
 
-Graft handles two shapes without any config.
-
-### Monorepo with one `.git`
-
-A single repo with `pnpm-workspace.yaml`/`package.json` `workspaces`, or per-package `go.mod`/`pyproject.toml`/`Cargo.toml`.
-
-- `graft build` discovers each sub-project as a **ranking scope**
-- `ask`/`map` rank every scope on its own terms and fuse the results, so the biggest sub-project can't drown a small one
-- Hits carry `[scope/]` labels
-- `graft map` groups its directory clusters by scope first
-
-### Folder of separate git repos
-
-A folder of separate git repos (no `.git` at the top).
-
-- `graft build` auto-splits: each child gets its own (git-ignored) `graft/`
-- The parent gets a `graft/workspace.json` index
-- Queries from the parent federate across every child, always labeled `<child>/`
-- Run `graft build` inside a child to work on just that repo
+- **Markdown nodes** (`graft/*.md`): linked nodes your agent opens and greps like any other file. See [Graph structure](/reference/graph-structure/).
+- **Code graph** (`graft/.graph/wiring.json`): the per-symbol code graph, plus a per-file wiring card mirroring your source tree.
 
 <Aside type="tip">
-Either way, narrow to one sub-project with `graft ask "<task>" --in <scope>/` once you know where you're working.
+`graft/` is a local cache like `node_modules`, and `trail init` adds it to `.gitignore`. Don't commit it.
 </Aside>

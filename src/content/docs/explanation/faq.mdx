@@ -1,0 +1,43 @@
+---
+title: FAQ
+description: Common questions about Trail-code, graft, learnings, context usage, API keys, supported agents, and cost.
+sidebar:
+  order: 7
+lastUpdated: 2026-10-24
+---
+
+## Is this graft?
+
+Yes. Trail-code is graft's new name, and graft lives on inside it as the graft map. The command is `trail` and the package is `@trailhq/trail-code`; `graft` and `@nanonets/graft` run the same code, print what they always printed, and keep working. See [Move from graft](/how-to/migrate-from-graft/).
+
+## How is this different from CLAUDE.md or AGENTS.md?
+
+You write those by hand, keep them current by hand, and your agent can skip them. Trail-code saves learnings from your conversations, brings in only the ones about the code you're working on, checks your changes against them before a PR, and adds a map of your code. It works next to your instruction files: `trail init` never touches your `CLAUDE.md`.
+
+## Will it fill up my context window?
+
+No. Each prompt gets only pointers to the matching code, and the learnings that match it, and a teammate's unmerged learnings show only their first lines. In the benchmark, uncached input tokens went down 42%.
+
+## Do I need an API key?
+
+No. The graft map, the hooks, learnings and `trail check` all work without one. A key only adds the written summaries from `trail build --deep`.
+
+## Do I need to sign in?
+
+No. Everything works on your machine, and learnings reach your team through git. A Trail workspace, coming soon, is only for the team page across repos.
+
+## Which agents does it work with?
+
+Claude Code gets the deepest setup: hooks, statusline, and learnings with every prompt. Trail-code also wires Cursor, Codex and other `AGENTS.md` readers, Gemini CLI, GitHub Copilot, Windsurf, Kiro, Antigravity, Grok, Hermes and AdaL, and serves any agent that speaks MCP.
+
+## What if it learns something wrong?
+
+A repo learning is a file in your pull request, so it gets reviewed like the code it is about. Delete or edit the file to drop it. Personal learnings are files in `~/.trail`, just as easy to change.
+
+## Does it work in monorepos?
+
+Yes: one repo with many packages, submodules, and folders of separate repos. See [Work with monorepos](/how-to/work-with-monorepos/).
+
+## What does it cost?
+
+The CLI is free and open source under the MIT license.

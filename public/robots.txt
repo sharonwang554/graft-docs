@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://graft.sharonwang.me/sitemap-index.xml

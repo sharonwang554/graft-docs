@@ -6,20 +6,25 @@ export default defineConfig({
 	site: 'https://graft.sharonwang.me',
 	output: 'static',
 	adapter: vercel(),
+	redirects: {
+		'/explanation/why-graft-exists': '/explanation/why-trail-code-exists/',
+		'/explanation/architecture-decisions': '/explanation/why-trail-code-exists/',
+	},
 	integrations: [
 		starlight({
-			title: 'Graft Docs',
+			title: 'Trail-code Docs',
 			customCss: [
 				'./src/styles/custom.css',
 			],
 			components: {
+				Banner: './src/components/Banner.astro',
 				Footer: './src/components/Footer.astro',
 				Head: './src/components/Head.astro',
 			},
-			description: 'Documentation for Graft — persistent context layer for AI coding agents',
+			description: 'Documentation for Trail-code (previously graft): the self-learning context layer for coding agents',
 			lastUpdated: true,
 			social: [
-				{ icon: 'github', label: 'GitHub', href: 'https://github.com/NanoNets/Graft' },
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/trailhq/Trail-Code' },
 			],
 			sidebar: [
 				{
@@ -27,6 +32,7 @@ export default defineConfig({
 					items: [
 						{ label: 'Quick Start', slug: 'tutorials/quick-start' },
 						{ label: 'Your First Graph', slug: 'tutorials/your-first-graph' },
+						{ label: 'Your First Learning', slug: 'tutorials/your-first-learning' },
 					],
 				},
 				{

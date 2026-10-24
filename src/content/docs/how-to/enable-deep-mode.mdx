@@ -1,53 +1,59 @@
 ---
-title: Enable Deep Mode
-description: Add LLM-powered summaries and concept nodes to your codebase graph.
+title: Enable deep mode
+description: Add LLM-written summaries, concept nodes, and per-symbol cruxes to the graft map with trail build --deep.
 sidebar:
-  order: 3
+  order: 7
+lastUpdated: 2026-10-24
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
-By default, `graft build` uses tree-sitter for deterministic, model-free structural parsing. The `--deep` flag adds a second pass that uses an LLM to generate richer summaries.
+By default, `trail build` uses tree-sitter: every symbol and call edge, no model, no key. `trail build --deep` adds plain-English summaries of each part of the system, written by the model provider you choose, under your own key.
 
 ## What deep mode adds
 
-| Feature | Standard build | Deep build |
+| | `trail build` | `trail build --deep` |
 |---|---|---|
-| File structure & symbols | ✅ | ✅ |
-| Call graph & dependencies | ✅ | ✅ |
-| Per-symbol one-line summaries | ❌ | ✅ |
-| Concept nodes | ❌ | ✅ |
-| "Crux" architectural insights | ❌ | ✅ |
+| Every function, class, and call edge (tree-sitter) | ✅ | ✅ |
+| Per-file wiring cards | ✅ | ✅ |
+| Concept nodes (file summaries + node synthesis) | | ✅ |
+| Per-symbol one-line summary and crux excerpt | | ✅ |
 
-## Enable deep mode
+## Run a deep build
 
 <Steps>
 
-1. **Set your LLM provider credentials**
+1. **Set your provider**
 
    ```bash
-   export GRAFT_PROVIDER=openai      # or anthropic, ollama, openrouter, google
-   export GRAFT_API_KEY=your-key
+   export GRAFT_PROVIDER=openai      # or anthropic, litellm, orcarouter
+   export GRAFT_API_KEY=<your key>
+   export GRAFT_MODEL=<model>
    ```
 
-   See [Configure Providers](/how-to/configure-providers/) for all supported providers.
+   See [Configure providers](/how-to/configure-providers/).
 
 2. **Run the deep build**
 
    ```bash
-   graft build --deep
+   trail build --deep
    ```
 
-   The first deep build summarizes every source file, then groups summaries into curated nodes. Results are cached by content hash — subsequent builds only re-process changed files.
+   To summarize only some extensions:
+
+   ```bash
+   trail build --deep -e .ts .py
+   ```
 
 </Steps>
 
+Every pass is cached by content hash, so re-running only touches the files that changed.
+
 <Aside type="caution">
-Deep mode calls your LLM provider and incurs API costs. The standard `graft build` (without `--deep`) is free, deterministic, and needs no API key.
+The `--deep` summaries go to the model provider you choose, under your own key. Plain `trail build` needs no key and never calls a model, and auto-sync never runs `--deep` for you.
 </Aside>
 
 ## See also
 
-- [Configure Providers](/how-to/configure-providers/) — Set up OpenAI, Anthropic, Ollama, and more.
-- [Environment Variables Reference](/reference/environment-variables/) — All `GRAFT_*` environment variables.
-- [How the graph gets built](/explanation/how-the-graph-gets-built/) — Architecture of the two-pass build.
+- [How the graph gets built](/explanation/how-the-graph-gets-built/)
+- [Environment variables](/reference/environment-variables/)

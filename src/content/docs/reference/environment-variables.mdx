@@ -1,28 +1,46 @@
 ---
-title: Environment Variables
-description: Complete reference for all Graft environment variables.
+title: Environment variables
+description: Every environment variable Trail-code reads, for providers, refresh, the statusline, and telemetry.
 sidebar:
   order: 2
+lastUpdated: 2026-10-24
 ---
 
-All Graft environment variables are prefixed with `GRAFT_`. They configure LLM providers for deep mode and control runtime behavior.
+Settings keep their `GRAFT_` names. See the repo's [`.env.example`](https://github.com/trailhq/Trail-Code/blob/main/.env.example) for the full list (model, base URL, graph directory).
 
-## LLM Provider Configuration
+## Provider (for `trail build --deep`)
 
-| Variable | Description | Example |
-|---|---|---|
-| `GRAFT_PROVIDER` | LLM provider name | `openai`, `anthropic`, `ollama`, `openrouter`, `google` |
-| `GRAFT_API_KEY` | API key for the chosen provider | `sk-...` |
-| `GRAFT_MODEL` | Model name to use | `gpt-4o-mini`, `claude-sonnet` |
-| `GRAFT_BASE_URL` | Custom base URL (for Ollama, LiteLLM proxy, or self-hosted) | `http://localhost:11434` |
+| Variable | Description |
+|---|---|
+| `GRAFT_PROVIDER` | `openai` for any OpenAI-compatible endpoint, `anthropic` for the native API, or `litellm` / `orcarouter` for a gateway that speaks the OpenAI-compatible format |
+| `GRAFT_API_KEY` | Your provider key |
+| `GRAFT_MODEL` | The model to use |
+| `GRAFT_BASE_URL` | For the `openai` wire format: point at OpenRouter, Fireworks, Groq, a LiteLLM proxy, a local server, or OpenAI itself |
+| `OPENROUTER_API_KEY` | Deprecated fallback for the key |
+| `ORCAROUTER_API_KEY` | A second fallback for the key |
 
-## Runtime Configuration
+The same settings can be passed as `--provider/--model/--api-key/--base-url` on the command line.
 
-| Variable | Description | Default |
-|---|---|---|
-| `GRAFT_NO_REFRESH` | Set to `1` to skip the automatic structural refresh before query commands | `0` (refresh enabled) |
+## Refresh
+
+| Variable | Description |
+|---|---|
+| `GRAFT_NO_REFRESH=1` | Answer from the graph exactly as it is on disk, for every command (same as `--no-refresh`) |
+| `GRAFT_REFRESH=hash` | Hash every file instead of trusting size+mtime |
+
+## Claude Code wiring
+
+| Variable | Description |
+|---|---|
+| `GRAFT_NO_STATUSLINE=1` | Skip writing the Claude Code `statusLine` (same as `trail init --no-statusline`) |
+
+## Telemetry
+
+| Variable | Description |
+|---|---|
+| `DO_NOT_TRACK=1` | Disables both network calls: the daily npm version check and the usage ping |
 
 ## See also
 
-- [Configure Providers](/how-to/configure-providers/) — Step-by-step provider setup.
-- [Enable Deep Mode](/how-to/enable-deep-mode/) — Using these variables for the deep build.
+- [Configure providers](/how-to/configure-providers/)
+- [Manage telemetry](/how-to/manage-telemetry/)

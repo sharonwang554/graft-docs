@@ -1,25 +1,35 @@
 ---
-title: MCP server
-description: Registering Graft's MCP server with agents.
+title: Set up the MCP server
+description: Register the Trail-code MCP server with your agent, automatically or by hand.
 sidebar:
-  order: 3
+  order: 4
+lastUpdated: 2026-10-24
 ---
 
-`graft init` also registers Graft's MCP server with agents that support it, so these six tools appear natively, no shell required. Claude Code gets this too: `graft init` writes the server into the project's `.mcp.json` (restart Claude Code to load it). Skip with `--no-mcp`; run it manually with `graft mcp [dir]`.
+`trail init` registers the Trail-code MCP server with agents that support it, so its six tools appear natively, no shell required. See [MCP tools](/reference/mcp-tools/) for what each one does.
 
-| Tool | Takes | What it's for |
-|---|---|---|
-| `graft_find_code` | a question | Ranked nodes with file:line, source inlined — usually the full answer, no follow-up read needed. |
-| `graft_file_api` | a file path | Every signature in that file, no bodies — the API surface for a tenth of the tokens. |
-| `graft_trace_calls` | a symbol | Who depends on it, or what it depends on with `direction: out`, N levels deep for blast radius. |
-| `graft_find_all` | a regex | Every hit, grouped by enclosing symbol, ranked by how coupled that symbol is. |
-| `graft_repo_map` | nothing | A first look at an unfamiliar repo: directory clusters, hubs, hotspots. |
-| `graft_check_freshness` | nothing | Whether the local graph has drifted from the code. |
+## Claude Code
+
+`trail init` writes the server into the project's `.mcp.json`. Restart Claude Code to load it.
+
+## Register it by hand
 
 Register it by hand if your agent needs it explicit:
 
 ```json
-{ "mcpServers": { "graft": { "command": "npx", "args": ["-y", "@nanonets/graft", "mcp"] } } }
+{ "mcpServers": { "trail": { "command": "npx", "args": ["-y", "@trailhq/trail-code", "mcp"] } } }
 ```
 
-Where a CLI agent supports user-level `hooks.json`, `init` also installs Graft's post-edit hook — blast-radius warnings and automatic `$0` graph re-sync after edits (skip with `--no-hooks`).
+## Run it by hand
+
+```bash
+trail mcp [dir]
+```
+
+## Skip MCP registration
+
+Pass `--no-mcp` to `trail init` to skip MCP registration for agents other than Claude Code.
+
+## Hooks for CLI agents
+
+Where a CLI agent supports user-level `hooks.json`, as Codex does, `init` also installs Trail-code's hooks there: session start, context with each prompt, blast radius and a `$0` graph re-sync after edits, and the end-of-turn sync. Skip them with `--no-hooks`.

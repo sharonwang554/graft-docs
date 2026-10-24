@@ -1,0 +1,35 @@
+---
+title: Manage telemetry
+description: See exactly what anonymous usage stats Trail-code sends, and turn them off.
+sidebar:
+  order: 12
+lastUpdated: 2026-10-24
+---
+
+Trail-code sends anonymous usage stats: a daily npm version check and one batched usage ping. The ping carries buckets and fixed labels only. See [What stays on your machine](/explanation/what-stays-on-your-machine/).
+
+## See what would be sent
+
+```bash
+trail telemetry debug
+```
+
+Prints exactly what your machine would send. [`TELEMETRY.md`](https://github.com/trailhq/Trail-Code/blob/main/TELEMETRY.md) lists every field.
+
+## Turn off the usage ping
+
+```bash
+trail telemetry disable
+```
+
+You can also uncheck the box in `trail init`. Both disable only the usage ping. `trail telemetry` also takes `status` and `enable`.
+
+## Turn off both network calls
+
+```bash
+export DO_NOT_TRACK=1
+```
+
+`DO_NOT_TRACK=1` disables both the version check and the usage ping.
+
+The ping is off in CI and in any build from source.

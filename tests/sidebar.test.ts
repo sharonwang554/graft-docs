@@ -17,8 +17,9 @@ describe('Sidebar configuration', () => {
   it('should reference the correct tutorial slugs', () => {
     const config = fs.readFileSync(CONFIG_PATH, 'utf-8');
 
-    expect(config).toContain('tutorials/getting-started');
+    expect(config).toContain('tutorials/quick-start');
     expect(config).toContain('tutorials/your-first-graph');
+    expect(config).toContain('tutorials/your-first-learning');
   });
 
   it('should autogenerate how-to, reference, and explanation sections', () => {
