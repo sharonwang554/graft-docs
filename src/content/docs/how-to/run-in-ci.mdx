@@ -1,0 +1,52 @@
+---
+title: Run in CI
+description: Report the blast radius of a pull request, fail on a stale graph, and publish the viewer in CI.
+sidebar:
+  order: 11
+lastUpdated: 2026-10-24
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Report a PR's blast radius
+
+Diff against the merge base with HEAD, which is what a PR job runs:
+
+```bash
+trail blast --base origin/main
+```
+
+To post it as a PR comment, with the areas a change can reach and per-symbol detail collapsed under it:
+
+```bash
+trail blast --format markdown
+```
+
+Other options:
+
+| Command | Effect |
+|---|---|
+| `trail blast --base origin/main --name` | Name those areas with one cached LLM call, instead of a full `--deep` build |
+| `trail blast --export-viz site/` | Also write the interactive page for this radius (what a PR comment links to) |
+| `trail blast --no-owners` | Skip "who to tag" (by default, git history names the people behind each area) |
+| `trail blast --depth all --format json` | The full transitive closure, machine-readable |
+
+## Fail when the graph has drifted
+
+Build nothing, and exit 1 if `graft/` has drifted from the code:
+
+```bash
+trail build --check
+```
+
+## Publish the viewer
+
+Write one self-contained `index.html` for CI, GitHub Pages, or a build artifact:
+
+```bash
+trail viz --export site/ --title "PR #12"
+```
+
+<Aside type="note">
+With no TTY to prompt on, `trail init` writes nothing and prints the command to run instead. Pass `--agents <ids>` or `--yes` to make a scripted run explicit. Anonymous usage stats are off in CI.
+</Aside>

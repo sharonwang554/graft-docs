@@ -1,4 +1,4 @@
-/* Graft Docs custom styles */
+/* Trail-code Docs custom styles */
 :root {
   --sl-color-accent-low: #1a1a2e;
   --sl-color-accent: #546FFF;
@@ -22,4 +22,29 @@ html[data-theme='dark'] .light-only {
   html:not([data-theme='light']) .light-only {
     display: none !important;
   }
+}
+
+/* Landing hero: the README banner is wide (about 3:1), so stack it full-width
+   above the centered copy instead of Starlight's side-by-side layout. */
+.hero {
+  grid-template-columns: 100%;
+  gap: 2rem;
+  padding-block: 2rem 1rem;
+}
+.hero > .hero-html {
+  order: 0;
+  width: 100%;
+}
+.hero > .hero-html img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+.hero .stack {
+  text-align: center;
+}
+.hero .copy,
+.hero .actions {
+  align-items: center;
+  justify-content: center;
 }

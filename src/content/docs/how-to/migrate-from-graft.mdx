@@ -1,0 +1,53 @@
+---
+title: Move from graft
+description: Move a graft setup to Trail-code. Every graft command and package still works.
+sidebar:
+  order: 1
+lastUpdated: 2026-10-24
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Nothing breaks. The code map you know is now called the graft map, and it is one of Trail-code's two parts.
+
+## What changed
+
+| | Before | Now |
+|---|---|---|
+| Name | graft | Trail-code |
+| The code map | graft | the graft map (same thing) |
+| Command | `graft` | `trail` (`graft` still works) |
+| Package | `@nanonets/graft` | `@trailhq/trail-code` (the old one still works) |
+| Learnings | None | New, see [Learnings](/explanation/learnings/) |
+
+`graft` and `@nanonets/graft` run the same code as `trail`, and print what they always printed. The MCP server still answers the old `graft_*` tool names, and settings keep their `GRAFT_` names.
+
+## Move a repo
+
+<Steps>
+
+1. **Add the `trail` command**
+
+   ```bash
+   graft upgrade
+   ```
+
+   Already have graft? `graft upgrade` adds the `trail` command next to it.
+
+2. **Let each repo move, or move it now**
+
+   Repos that graft set up move to trail on their own: once the `trail` command is installed, each one moves the first time you open Claude Code in it. To move one right away, run:
+
+   ```bash
+   trail init
+   ```
+
+3. **Commit what changes**
+
+   Commit what changes so your teammates move too.
+
+</Steps>
+
+<Aside type="note">
+New to learnings? Start with [Your first learning](/tutorials/your-first-learning/).
+</Aside>

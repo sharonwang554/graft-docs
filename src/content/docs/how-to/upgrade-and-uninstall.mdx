@@ -1,0 +1,36 @@
+---
+title: Upgrade and uninstall
+description: Upgrade Trail-code to the latest version, or remove everything it wrote.
+sidebar:
+  order: 13
+lastUpdated: 2026-10-24
+---
+
+## Upgrade
+
+```bash
+trail upgrade
+```
+
+Runs `npm install -g` for the latest published version. A new version is announced automatically (checked once a day). After upgrading, the next session refreshes this repo's wiring itself.
+
+## Uninstall from a repo
+
+`trail uninstall` removes every file and config entry it wrote here: the inverse of `init`. Without `-y` it prints what it would remove and exits:
+
+```bash
+trail uninstall
+```
+
+To actually remove:
+
+```bash
+trail uninstall -y
+```
+
+Options:
+
+| Flag | Effect |
+|---|---|
+| `--keep-cache` | Wiring only; leave `graft/` and the `.gitignore` entry |
+| `--no-global` | Leave out-of-repo files alone (`~/.claude`, `~/.claude.json`, `~/.codex`, `~/.gemini`) |

@@ -1,0 +1,26 @@
+---
+title: MCP tools
+description: The six tools the Trail-code MCP server exposes to coding agents.
+sidebar:
+  order: 4
+lastUpdated: 2026-10-24
+---
+
+The Trail-code MCP server exposes six tools. Run it with `trail mcp [dir]`; `trail init` registers it for you. See [Set up the MCP server](/how-to/set-up-mcp-server/).
+
+| Tool | Takes | What it's for |
+|---|---|---|
+| `trail_find_code` | a question | Ranked nodes with file:line, source inlined; usually the full answer, no follow-up read needed. |
+| `trail_file_api` | a file path | Every signature in that file, no bodies: the API surface for a tenth of the tokens. |
+| `trail_trace_calls` | a symbol | Who depends on it, or what it depends on with `direction: out`, N levels deep for blast radius. |
+| `trail_find_all` | a regex | Every hit, grouped by enclosing symbol, ranked by how coupled that symbol is. |
+| `trail_repo_map` | nothing | A first look at an unfamiliar repo: directory clusters, hubs, hotspots. |
+| `trail_check_freshness` | nothing | Whether the local graph has drifted from the code. |
+
+The same server still answers the old `graft_*` tool names.
+
+## Server config
+
+```json
+{ "mcpServers": { "trail": { "command": "npx", "args": ["-y", "@trailhq/trail-code", "mcp"] } } }
+```

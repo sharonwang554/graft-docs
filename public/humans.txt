@@ -2,7 +2,7 @@
 Engineer: Sharon Wang
 GitHub: https://github.com/sharonwang554
 Website: https://www.sharonwang.me/
-Note: This documentation portal is an unsolicited community contribution for the open-source Graft project. I am not affiliated with NanoNets or the core maintainers.
+Note: This documentation portal is an unsolicited community contribution for the open-source Trail-code project (previously Graft). I am not affiliated with Trail, NanoNets, or the core maintainers.
 
 /* SITE */
 Standards: HTML5, CSS3

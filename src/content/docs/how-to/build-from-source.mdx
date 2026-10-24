@@ -1,0 +1,18 @@
+---
+title: Build from source
+description: Clone the Trail-code repo, build it, run its tests, and run the CLI from source.
+sidebar:
+  order: 14
+lastUpdated: 2026-10-24
+---
+
+```bash
+git clone https://github.com/trailhq/Trail-Code.git && cd Trail-Code
+npm install
+npm run build
+npm test
+
+npm run cli -- build --deep .      # run the CLI from source
+```
+
+Anonymous usage stats are off in any build from source. Trail-code is MIT licensed; see [LICENSE](https://github.com/trailhq/Trail-Code/blob/main/LICENSE).

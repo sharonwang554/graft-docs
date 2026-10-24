@@ -1,0 +1,31 @@
+---
+title: Work with your team
+description: Share learnings through git, and see what your team learned this week and where work overlaps.
+sidebar:
+  order: 6
+lastUpdated: 2026-10-24
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Learnings reach your teammates through git, with no server.
+
+## Share learnings
+
+Commit `.trail/`, and every clone has them. Learnings on a teammate's pushed branch show up before it merges, marked "pushed and not merged yet", with only their first lines.
+
+## See what the team learned this week
+
+```bash
+trail team
+```
+
+`trail team` shows the last 7 days in your terminal: what the team learned, who's working on what, and where work overlaps.
+
+## Find out when a teammate changes the same code
+
+In Claude Code, your agent says so right after it edits code a teammate's open branch also changes, and whether the two clash. See [Integrate with Claude Code](/how-to/integrate-claude-code/#what-a-session-gets).
+
+<Aside type="note" title="Coming soon">
+A Trail workspace, for your team's view across repos. A team page will show who is learning what, how often learnings were reused, and where work overlaps. See [What stays on your machine](/explanation/what-stays-on-your-machine/) for what a connected workspace sends.
+</Aside>

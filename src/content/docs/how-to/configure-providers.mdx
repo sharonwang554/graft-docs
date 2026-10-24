@@ -1,71 +1,56 @@
 ---
-title: Configure LLM Providers
-description: Set up OpenAI, Anthropic, Ollama, OpenRouter, Google, and other LLM providers for Graft's deep mode.
+title: Configure providers
+description: Point trail build --deep at OpenAI, Anthropic, an OpenAI-compatible endpoint, or a LiteLLM or OrcaRouter gateway.
 sidebar:
-  order: 4
+  order: 8
+lastUpdated: 2026-10-24
 ---
 
-import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
-Graft's `--deep` mode uses an LLM to generate summaries. You can use any supported provider — your key, your model, your choice.
+The graft map is vendor-neutral. Only the LLM-written parts, from `trail build --deep`, go through your provider key. Settings keep their `GRAFT_` names.
 
-## Supported providers
+## Choose a provider
 
-| Provider | `GRAFT_PROVIDER` value | Example models |
-|---|---|---|
-| OpenAI | `openai` | gpt-4o, gpt-4o-mini |
-| Anthropic | `anthropic` | Claude Sonnet, Claude Haiku |
-| Google | `google` | Gemini 1.5 Pro, Gemini Flash |
-| Ollama (local) | `ollama` | LLaMA, Mistral, etc. |
-| OpenRouter | `openrouter` | Any model via OpenRouter |
-| LiteLLM proxy | Set `GRAFT_BASE_URL` | Any model behind the proxy |
+Set `GRAFT_PROVIDER` to one of:
 
-## Configuration
+| Value | Use it for |
+|---|---|
+| `openai` | Any OpenAI-compatible endpoint |
+| `anthropic` | The native Anthropic API |
+| `litellm` | A LiteLLM gateway that speaks the OpenAI-compatible format |
+| `orcarouter` | An OrcaRouter gateway that speaks the OpenAI-compatible format |
 
-<Tabs>
-  <TabItem label="OpenAI">
-    ```bash
-    export GRAFT_PROVIDER=openai
-    export GRAFT_API_KEY=sk-...
-    export GRAFT_MODEL=gpt-4o-mini   # optional, has a default
-    ```
-  </TabItem>
-  <TabItem label="Anthropic">
-    ```bash
-    export GRAFT_PROVIDER=anthropic
-    export GRAFT_API_KEY=sk-ant-...
-    export GRAFT_MODEL=claude-sonnet  # optional
-    ```
-  </TabItem>
-  <TabItem label="Google">
-    ```bash
-    export GRAFT_PROVIDER=google
-    export GRAFT_API_KEY=...
-    export GRAFT_MODEL=gemini-1.5-flash  # optional
-    ```
-  </TabItem>
-  <TabItem label="Ollama">
-    ```bash
-    export GRAFT_PROVIDER=ollama
-    export GRAFT_BASE_URL=http://localhost:11434
-    export GRAFT_MODEL=llama3
-    # No API key needed for local models
-    ```
-  </TabItem>
-  <TabItem label="OpenRouter">
-    ```bash
-    export GRAFT_PROVIDER=openrouter
-    export GRAFT_API_KEY=sk-or-...
-    export GRAFT_MODEL=anthropic/claude-sonnet
-    ```
-  </TabItem>
-</Tabs>
+Then set your key and model:
 
-<Aside type="tip">
-You can also set these via CLI flags: `graft build --deep --provider openai --model gpt-4o-mini`
+```bash
+export GRAFT_PROVIDER=anthropic
+export GRAFT_API_KEY=<your key>
+export GRAFT_MODEL=<model>
+```
+
+## Point at an OpenAI-compatible endpoint
+
+For the `openai` wire format, set `GRAFT_BASE_URL` to point at OpenRouter, Fireworks, Groq, a LiteLLM proxy, a local server, or OpenAI itself:
+
+```bash
+export GRAFT_PROVIDER=openai
+export GRAFT_API_KEY=<your key>
+export GRAFT_MODEL=<model>
+export GRAFT_BASE_URL=<endpoint URL>
+```
+
+## Pass settings on the command line
+
+```bash
+trail build --deep --provider <provider> --model <model> --api-key <key> --base-url <url>
+```
+
+<Aside type="note">
+`OPENROUTER_API_KEY` still works as a deprecated fallback, and `ORCAROUTER_API_KEY` as a second one. See the repo's [`.env.example`](https://github.com/trailhq/Trail-Code/blob/main/.env.example) for the full list.
 </Aside>
 
 ## See also
 
-- [Environment Variables Reference](/reference/environment-variables/) — Complete list of `GRAFT_*` variables.
-- [Enable Deep Mode](/how-to/enable-deep-mode/) — How to run the deep build.
+- [Environment variables](/reference/environment-variables/)
+- [Enable deep mode](/how-to/enable-deep-mode/)

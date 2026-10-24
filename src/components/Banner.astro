@@ -1,0 +1,29 @@
+---
+import Default from '@astrojs/starlight/components/Banner.astro';
+import { source } from '../data/source';
+
+const shortCommit = source.commit.slice(0, 7);
+---
+
+<div class="community-banner" data-pagefind-ignore>
+	Unofficial community docs. Content pulled on {source.pulledOn} from{' '}
+	<a href={`${source.repo}/blob/${source.commit}/README.md`}>Trail-Code@{shortCommit}</a>.
+	For the latest, see the{' '}<a href={source.repo}>official repo</a>.
+</div>
+<Default />
+
+<style>
+	.community-banner {
+		padding: 0.5rem var(--sl-nav-pad-x);
+		background-color: var(--sl-color-bg-accent);
+		color: var(--sl-color-text-invert);
+		font-size: var(--sl-text-sm);
+		line-height: var(--sl-line-height-headings);
+		text-align: center;
+		text-wrap: balance;
+	}
+	.community-banner a {
+		color: inherit;
+		text-decoration: underline;
+	}
+</style>

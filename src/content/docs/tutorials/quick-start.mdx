@@ -1,45 +1,58 @@
 ---
 title: Quick start
-description: Install Graft and build your first codebase graph.
+description: Install Trail-code, build the graft map, and wire it into your coding agents.
+sidebar:
+  order: 1
+lastUpdated: 2026-10-24
 ---
 
-import { Steps } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
-Graft gives your AI coding agent persistent context about your codebase. This tutorial walks you through installation and your first graph build.
+Trail-code gives your coding agent a map of your code, and what your team has learned about it. This tutorial walks you through installing it and setting it up in a repo.
 
-## Install and Initialize
+## Install and initialize
 
 <Steps>
 
-1. **Install Graft globally**
+1. **Install the CLI, once**
 
    ```bash
-   npm install -g @nanonets/graft
+   npm install -g @trailhq/trail-code
    ```
-   *Prefer not to install globally? `npx @nanonets/graft init` works the same way.*
 
-2. **Initialize in your project**
-
-   Navigate to your project directory and run:
+2. **Initialize in your repo**
 
    ```bash
-   graft init
+   trail init
    ```
 
-   `graft init` will ask which of your coding agents to wire up, build the `graft/` graph from your code, and drop a statusline and hooks into your agent's config (e.g. `.claude/`). From the next session on, Graft rides along in your coding agent: it pulls the matching nodes into each prompt and rebuilds the graph in the background after every turn. 
+   `trail init` asks which of your coding agents to wire up, builds the graft map from your code, creates `.trail/` for the repo's learnings, and adds a statusline and hooks to Claude Code.
 
-   Nothing is written until you pick. Run `graft init --dry-run` to see every file it would touch first, or `graft init --agents claude` to skip the prompt and wire Claude Code alone.
+   It also reads your past Claude Code sessions in the repo, once, for what you told Claude more than once, and saves those as learnings. Your own Claude Code does that reading, in about a minute.
 
-   ![Graft rides along in a Claude Code session](/assets/graft-terminal.png)
+   Run `trail init --dry-run` to see the agent wiring it would write, or `trail init --agents claude` to wire Claude Code alone.
 
-3. **Commit the wiring**
+3. **Commit the setup**
 
-   `graft build` adds `graft/` to your `.gitignore` automatically — the graph is a local, regenerable cache (like `node_modules`), not something you commit. What you share is the wiring `init` dropped into `.claude/`; each teammate runs `graft build` to generate their own graph:
+   Commit the setup so your teammates get it too. The graft map itself, in `graft/`, is a local cache like `node_modules` and is added to `.gitignore`, so it stays out of the commit:
 
    ```bash
-   git add .claude && git commit -m "wire in graft"
+   git add .claude .mcp.json .trail .gitignore .ignore && git commit -m "set up Trail-code"
    ```
+
+   Teammates' Claude Code reads the learnings in `.trail/` even before they install anything, and tells them once how to get the rest.
+
+4. **Work the way you always do**
+
+   That is the whole setup. No daemon, no server, nothing to babysit: it is all files.
 
 </Steps>
 
-No daemon, no re-indexing to remember, nothing to run or maintain by default — the graph is just files.
+<Aside type="tip">
+Already using graft? See [Move from graft](/how-to/migrate-from-graft/). Nothing breaks.
+</Aside>
+
+## Next steps
+
+- [Your first graph](/tutorials/your-first-graph/): explore the graft map from the command line.
+- [Your first learning](/tutorials/your-first-learning/): save a learning and check a change against it.

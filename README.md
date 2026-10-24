@@ -2,13 +2,13 @@
 
 [![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
 
-This repository contains a community documentation portal for **[Graft](https://github.com/NanoNets/Graft)** — the open-source context layer for AI coding agents.
+This repository contains a community documentation portal for **[Trail-code](https://github.com/trailhq/Trail-Code)** (previously Graft) — the self-learning context layer for coding agents. Content is organized from the upstream README.
 
 The site is built with [Astro Starlight](https://starlight.astro.build/) and structured using the [Diataxis](https://diataxis.fr/) framework, organizing content into Tutorials, How-To Guides, Reference, and Explanation.
 
 ## 🚀 Quick Start
 
-Ensure you have [Node.js](https://nodejs.org/) installed, then run:
+Use [Node.js](https://nodejs.org/) 22.23.4 or newer (`nvm use` picks the version in `.nvmrc`), then run:
 
 ```bash
 # Install dependencies
@@ -27,21 +27,27 @@ All documentation content lives in `src/content/docs/`. The structure follows Di
 src/content/docs/
 ├── index.mdx                       # Landing page
 ├── tutorials/                      # Learning-oriented: step-by-step guides
-│   ├── getting-started.mdx
-│   └── your-first-graph.mdx
+│   ├── quick-start.mdx
+│   ├── your-first-graph.mdx
+│   └── your-first-learning.mdx
 ├── how-to/                         # Task-oriented: solving specific problems
+│   ├── migrate-from-graft.mdx
 │   ├── integrate-claude-code.mdx
-│   ├── set-up-mcp-server.mdx
+│   ├── save-and-check-learnings.mdx
 │   └── ...
 ├── reference/                      # Information-oriented: technical descriptions
 │   ├── cli.mdx
-│   ├── graph-structure.mdx
+│   ├── learning-file-format.mdx
 │   └── ...
 └── explanation/                    # Understanding-oriented: concepts and background
-    ├── why-graft-exists.mdx
-    ├── how-the-graph-works.mdx
+    ├── why-trail-code-exists.mdx
+    ├── learnings.mdx
     └── ...
 ```
+
+Content is organized from the upstream README. The source commit and pull date shown in the site banner live in `src/data/source.ts`; update them, and each page's `lastUpdated` frontmatter, when re-syncing.
+
+`/llms.txt` (page index) and `/llms-full.txt` (full text) are generated from the docs at build time by `src/pages/llms.txt.ts` and `src/pages/llms-full.txt.ts`.
 
 ## 🛠️ Development & Testing
 
